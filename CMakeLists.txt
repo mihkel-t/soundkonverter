@@ -29,7 +29,7 @@ set_package_properties(Qt6 PROPERTIES
     PURPOSE "Required application components"
 )
 
-find_package(KF6 ${KF_MIN_VERSION} COMPONENTS I18n XmlGui KIO Solid Config ConfigWidgets WidgetsAddons StatusNotifierItem)
+find_package(KF6 ${KF_MIN_VERSION} COMPONENTS I18n XmlGui KIO Solid Config ConfigWidgets WidgetsAddons StatusNotifierItem KCMUtils)
 set_package_properties(KF6 PROPERTIES
     TYPE REQUIRED
     PURPOSE "Required application components"

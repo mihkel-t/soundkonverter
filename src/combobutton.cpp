@@ -63,7 +63,7 @@ void ComboButton::insertItem(const QString &text, int index)
         index = m_box->count();
     m_box->insertItem(index, text);
     if (text.length() > m_box->minimumContentsLength())
-        m_box->setMinimumContentsLength(text.count());
+        m_box->setMinimumContentsLength(text.length());
     repaintButton();
 }
 
@@ -73,7 +73,7 @@ void ComboButton::insertItem(const QIcon &icon, const QString &text, int index)
         index = m_box->count();
     m_box->insertItem(index, icon, text);
     if (text.length() > m_box->minimumContentsLength())
-        m_box->setMinimumContentsLength(text.count());
+        m_box->setMinimumContentsLength(text.length());
     repaintButton();
 }
 

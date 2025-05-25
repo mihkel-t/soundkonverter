@@ -97,7 +97,7 @@ void ReplayGainFileList::dragEnterEvent(QDragEnterEvent *event)
 
 void ReplayGainFileList::dragMoveEvent(QDragMoveEvent *event)
 {
-    if (itemAt(event->pos()) && static_cast<ReplayGainFileListItem *>(itemAt(event->pos()))->type != ReplayGainFileListItem::Track)
+    if (itemAt(event->position().toPoint()) && static_cast<ReplayGainFileListItem *>(itemAt(event->position().toPoint()))->type != ReplayGainFileListItem::Track)
         QTreeWidget::dragMoveEvent(event);
 }
 
@@ -112,7 +112,7 @@ void ReplayGainFileList::dropEvent(QDropEvent *event)
     QString fileName;
 
     if (event->source() == this) {
-        ReplayGainFileListItem *destination = static_cast<ReplayGainFileListItem *>(itemAt(event->pos()));
+        ReplayGainFileListItem *destination = static_cast<ReplayGainFileListItem *>(itemAt(event->position().toPoint()));
 
         if (!destination) {
             QTreeWidget::dropEvent(event);
