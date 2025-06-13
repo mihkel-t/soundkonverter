@@ -5,7 +5,7 @@
 #include "maccodecwidget.h"
 #include "soundkonverter_codec_mac.h"
 
-soundkonverter_codec_mac::soundkonverter_codec_mac(QObject *parent, const QVariantList &args)
+soundkonverter_codec_mac::soundkonverter_codec_mac(QObject *parent, const KPluginMetaData &metadata, const QVariantList &args)
     : CodecPlugin(parent)
 {
     Q_UNUSED(args)
@@ -157,9 +157,9 @@ float soundkonverter_codec_mac::parseOutput(const QString &output)
 {
     // Progress: 55.2% (1.0 seconds remaining, 1.2 seconds total)
 
-    QRegExp regEnc("Progress:\\s+(\\d+.\\d)%");
+    static QRegularExpression regEnc("Progress:\\s+(\\d+.\\d)%");
     if (output.contains(regEnc)) {
-        return regEnc.cap(1).toFloat();
+        return regEnc.match(output).captured(1).toFloat();
     }
 
     return -1;

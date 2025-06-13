@@ -540,5 +540,3 @@ void soundKonverterView::cleanupParameters(QString *profile, QString *format)
     *profile = new_profile;
     *format = new_format;
 }
-
-#include "soundkonverterview.moc"

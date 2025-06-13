@@ -3,7 +3,7 @@
 #define SOUNDKONVERTER_CODEC_AFTEN_H
 
 #include "../../core/codecplugin.h"
-#include <KPluginMetaData>
+#include <KPluginFactory>
 
 class ConversionOptions;
 

@@ -31,6 +31,7 @@ int main(int argc, char **argv)
     about.addCredit(i18n("Amarok developers"), i18n("Amarok"), 0, "http://amarok.kde.org");
     about.addCredit(i18n("All programmers of audio converters"), i18n("Backends"));
     about.addCredit(i18n("Patrick Auernig"), i18n("Inital Port to KDE Frameworks 5"), "patrick.auernig@gmail.com");
+    KAboutData::setApplicationData(about);
 
     QCommandLineParser parser;
     parser.addOption(QCommandLineOption("replaygain", i18n("Open the Replay Gain tool and add all given files")));

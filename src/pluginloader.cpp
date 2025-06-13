@@ -167,148 +167,139 @@ void PluginLoader::load()
         }
     }
 
+    const QVector<KPluginMetaData> filterPluginsVect = KPluginMetaData::findPlugins("soundkonverterplugins/filter");
+    for (const KPluginMetaData &filterPlugin : filterPluginsVect) {
+        if (auto pluginResult = KPluginFactory::instantiatePlugin<FilterPlugin>(filterPlugin, this, QVariantList())) {
+            auto plugin = pluginResult.plugin;
+            plugin->scanForBackends();
+            QMap<QString, int> encodeCodecs;
+            QMap<QString, int> decodeCodecs;
+            QList<ConversionPipeTrunk> codecTable = plugin->codecTable();
+            for (int j = 0; j < codecTable.count(); j++) {
+                codecTable[j].plugin = plugin;
+                conversionPipeTrunks.append(codecTable.at(j));
+                if (codecTable.at(j).codecTo != "wav")
+                    encodeCodecs[codecTable.at(j).codecTo] += codecTable.at(j).enabled;
+                if (codecTable.at(j).codecFrom != "wav")
+                    decodeCodecs[codecTable.at(j).codecFrom] += codecTable.at(j).enabled;
+                addFormatInfo(codecTable.at(j).codecFrom, plugin);
+                addFormatInfo(codecTable.at(j).codecTo, plugin);
+            }
+            if (encodeCodecs.count() > 0) {
+                logger->log(1000, "\t\tencode:");
+                for (int j = 0; j < encodeCodecs.count(); j++) {
+                    QString spaces;
+                    spaces.fill(' ', 12 - encodeCodecs.keys().at(j).length());
+                    logger->log(
+                        1000,
+                        "<pre>\t\t\t"
+                            + QString("%1%2(%3)")
+                                  .arg(encodeCodecs.keys().at(j))
+                                  .arg(spaces)
+                                  .arg(encodeCodecs.values().at(j) ? "<span style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>")
+                            + "</pre>");
+                }
+            }
+            if (decodeCodecs.count() > 0) {
+                logger->log(1000, "\t\tdecode:");
+                for (int j = 0; j < decodeCodecs.count(); j++) {
+                    QString spaces;
+                    spaces.fill(' ', 12 - decodeCodecs.keys().at(j).length());
+                    logger->log(
+                        1000,
+                        "<pre>\t\t\t"
+                            + QString("%1%2(%3)")
+                                  .arg(decodeCodecs.keys().at(j))
+                                  .arg(spaces)
+                                  .arg(decodeCodecs.values().at(j) ? "<span style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>")
+                            + "</pre>");
+                }
+            }
+            logger->log(1000, "");
+
+            filterPlugins << plugin;
+        } else {
+            logger->log(1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + filterPlugin.fileName() + "</span></pre>");
+        }
+    }
+
     /*
-    const QVector<KPluginMetaData> filtersPlugin = KPluginMetaData::findPlugins("soundkonverter/filter");
-    for (const KPluginMetaData &plugin : filtersPlugins) {
 
-    if( !offers.isEmpty() )
-    {
-        for( int i=0; i<offers.size(); i++ )
-        {
-            createInstanceTime.start();
-            QVariantList allArgs;
-            allArgs << offers.at(i)->storageId() << "";
-            QString error;
+     offers = KServiceTypeTrader::self()->query("soundKonverter/ReplayGainPlugin");
 
-            FilterPlugin *plugin = offers.at(i).data()->createInstance<FilterPlugin>(0, allArgs, &error );
-            if( plugin )
-            {
-                logger->log( 1000, "\tloading plugin: " + plugin->name() );
-                createInstanceTimeSum += createInstanceTime.elapsed();
-                filterPlugins.append( plugin );
-                plugin->scanForBackends();
-                QMap<QString,int> encodeCodecs;
-                QMap<QString,int> decodeCodecs;
-                QList<ConversionPipeTrunk> codecTable = plugin->codecTable();
-                for( int j = 0; j < codecTable.count(); j++ )
-                {
-                    codecTable[j].plugin = plugin;
-                    filterPipeTrunks.append( codecTable.at(j) );
-                    if( codecTable.at(j).codecTo != "wav" )
-                        encodeCodecs[codecTable.at(j).codecTo] += codecTable.at(j).enabled;
-                    if( codecTable.at(j).codecFrom != "wav" )
-                        decodeCodecs[codecTable.at(j).codecFrom] += codecTable.at(j).enabled;
-                    addFormatInfo( codecTable.at(j).codecFrom, plugin );
-                    addFormatInfo( codecTable.at(j).codecTo, plugin );
-                }
-                if( encodeCodecs.count() > 0 )
-                {
-                    logger->log( 1000, "\t\tencode:" );
-                    for( int j=0; j<encodeCodecs.count(); j++ )
-                    {
-                        QString spaces;
-                        spaces.fill( ' ', 12 - encodeCodecs.keys().at(j).length() );
-                        logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3)").arg(encodeCodecs.keys().at(j)).arg(spaces).arg(encodeCodecs.values().at(j) ?
-    "<span style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>") + "</pre>" );
-                    }
-                }
-                if( decodeCodecs.count() > 0 )
-                {
-                    logger->log( 1000, "\t\tdecode:" );
-                    for( int j=0; j<decodeCodecs.count(); j++ )
-                    {
-                        QString spaces;
-                        spaces.fill( ' ', 12 - decodeCodecs.keys().at(j).length() );
-                        logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3)").arg(decodeCodecs.keys().at(j)).arg(spaces).arg(decodeCodecs.values().at(j) ?
-    "<span style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>") + "</pre>" );
-                    }
-                }
-                // TODO filters
-                logger->log( 1000, "" );
-            }
-            else
-            {
-                logger->log( 1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + offers.at(i)->library() + "</span></pre>" );
-            }
-        }
-    }
+      if( !offers.isEmpty() )
+      {
+          for( int i=0; i<offers.size(); i++ )
+          {
+              createInstanceTime.start();
+              QVariantList allArgs;More actions
+              allArgs << offers.at(i)->storageId() << "";
+              QString error;
 
-    offers = KServiceTypeTrader::self()->query("soundKonverter/ReplayGainPlugin");
+             ReplayGainPlugin *plugin = offers.at(i).data()->createInstance<ReplayGainPlugin>(0, allArgs, &error );
+             if( plugin )
+             {
+                 logger->log( 1000, "\tloading plugin: " + plugin->name() );
+                 createInstanceTimeSum += createInstanceTime.elapsed();
+                 replaygainPlugins.append( plugin );
+                 plugin->scanForBackends();
+                 QList<ReplayGainPipe> codecTable = plugin->codecTable();
+                 for( int j = 0; j < codecTable.count(); j++ )
+                 {
+                     codecTable[j].plugin = plugin;
+                     replaygainPipes.append( codecTable.at(j) );
+                     QString spaces;
+                     spaces.fill( ' ', 12 - codecTable.at(j).codecName.length() );
+                     logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3)").arg(codecTable.at(j).codecName).arg(spaces).arg(codecTable.at(j).enabled ? "<span
+     style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>") + "</pre>" ); addFormatInfo( codecTable.at(j).codecName, plugin );
+                 }
+                 logger->log( 1000, "" );
+             }
+             else
+             {
+                 logger->log( 1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + offers.at(i)->library() + "</span></pre>" );
+             }
+         }
+     }
 
-    if( !offers.isEmpty() )
-    {
-        for( int i=0; i<offers.size(); i++ )
-        {
-            createInstanceTime.start();
-            QVariantList allArgs;
-            allArgs << offers.at(i)->storageId() << "";
-            QString error;
+     offers = KServiceTypeTrader::self()->query("soundKonverter/RipperPlugin");
 
-            ReplayGainPlugin *plugin = offers.at(i).data()->createInstance<ReplayGainPlugin>(0, allArgs, &error );
-            if( plugin )
-            {
-                logger->log( 1000, "\tloading plugin: " + plugin->name() );
-                createInstanceTimeSum += createInstanceTime.elapsed();
-                replaygainPlugins.append( plugin );
-                plugin->scanForBackends();
-                QList<ReplayGainPipe> codecTable = plugin->codecTable();
-                for( int j = 0; j < codecTable.count(); j++ )
-                {
-                    codecTable[j].plugin = plugin;
-                    replaygainPipes.append( codecTable.at(j) );
-                    QString spaces;
-                    spaces.fill( ' ', 12 - codecTable.at(j).codecName.length() );
-                    logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3)").arg(codecTable.at(j).codecName).arg(spaces).arg(codecTable.at(j).enabled ? "<span
-    style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>") + "</pre>" ); addFormatInfo( codecTable.at(j).codecName, plugin );
-                }
-                logger->log( 1000, "" );
-            }
-            else
-            {
-                logger->log( 1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + offers.at(i)->library() + "</span></pre>" );
-            }
-        }
-    }
-
-    offers = KServiceTypeTrader::self()->query("soundKonverter/RipperPlugin");
-
-    if( !offers.isEmpty() )
-    {
-        for( int i=0; i<offers.size(); i++ )
-        {
-            createInstanceTime.start();
-            QVariantList allArgs;
-            allArgs << offers.at(i)->storageId() << "";
-            QString error;
-            RipperPlugin *plugin = offers.at(i).data()->createInstance<RipperPlugin>(0, allArgs, &error );
-            if( plugin )
-            {
-                logger->log( 1000, "\tloading plugin: " + plugin->name() );
-                createInstanceTimeSum += createInstanceTime.elapsed();
-                ripperPlugins.append( plugin );
-                plugin->scanForBackends();
-                QList<ConversionPipeTrunk> codecTable = plugin->codecTable();
-                for( int j = 0; j < codecTable.count(); j++ )
-                {
-                    codecTable[j].plugin = plugin;
-                    conversionPipeTrunks.append( codecTable.at(j) );
-                    QString spaces;
-                    spaces.fill( ' ', 12 - codecTable.at(j).codecTo.length() );
-                    logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3, %4)").arg(codecTable.at(j).codecTo).arg(spaces).arg(codecTable.at(j).enabled ? "<span
-    style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>").arg(codecTable.at(j).data.canRipEntireCd ? "<span
-    style=\"color:green\">can rip to single file</span>" : "<span style=\"color:red\">can't rip to single file</span>") + "</pre>" );
-                }
-                logger->log( 1000, "" );
-            }
-            else
-            {
-                logger->log( 1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + offers.at(i)->library() + "</span></pre>" );
-            }
-        }
-    }
-
+      if( !offers.isEmpty() )
+      {
+          for( int i=0; i<offers.size(); i++ )
+          {
+              createInstanceTime.start();
+              QVariantList allArgs;
+              allArgs << offers.at(i)->storageId() << "";
+              QString error;
+              RipperPlugin *plugin = offers.at(i).data()->createInstance<RipperPlugin>(0, allArgs, &error );
+              if( plugin )
+              {
+                  logger->log( 1000, "\tloading plugin: " + plugin->name() );
+                  createInstanceTimeSum += createInstanceTime.elapsed();
+                  ripperPlugins.append( plugin );
+                  plugin->scanForBackends();
+                  QList<ConversionPipeTrunk> codecTable = plugin->codecTable();
+                  for( int j = 0; j < codecTable.count(); j++ )
+                  {
+                      codecTable[j].plugin = plugin;
+                      conversionPipeTrunks.append( codecTable.at(j) );
+                      QString spaces;
+                      spaces.fill( ' ', 12 - codecTable.at(j).codecTo.length() );
+                      logger->log( 1000, "<pre>\t\t\t" + QString("%1%2(%3, %4)").arg(codecTable.at(j).codecTo).arg(spaces).arg(codecTable.at(j).enabled ? "<span
+      style=\"color:green\">enabled</span>" : "<span style=\"color:red\">disabled</span>").arg(codecTable.at(j).data.canRipEntireCd ? "<span
+      style=\"color:green\">can rip to single file</span>" : "<span style=\"color:red\">can't rip to single file</span>") + "</pre>" );
+                  }
+                  logger->log( 1000, "" );
+              }
+              else
+              {
+                  logger->log( 1000, "<pre>\t<span style=\"color:red\">failed to load plugin: " + offers.at(i)->library() + "</span></pre>" );
+              }
+              }
+      }
+     */
     conversionFilterPipeTrunks = conversionPipeTrunks + filterPipeTrunks;
-    */
 
     logger->log(1000, QString("... all plugins loaded (took %1 ms, creating instances: %2 ms)").arg(overallTime.elapsed()).arg(createInstanceTimeSum) + "\n");
 }

@@ -777,26 +777,26 @@ bool TagEngine::writeTags(const QUrl &fileName, TagData *tagData)
         } else if (TagLib::MP4::File *file = dynamic_cast<TagLib::MP4::File *>(fileref.file())) {
             if (TagLib::MP4::Tag *tag = file->tag()) {
                 if (!tagData->albumArtist.isEmpty())
-                    tag->itemMap().value("aART", TagLib::StringList(TagLib::String(tagData->albumArtist.toUtf8().data(), TagLib::String::UTF8)));
+                    tag->setItem("aART", TagLib::StringList(TagLib::String(tagData->albumArtist.toUtf8().data(), TagLib::String::UTF8)));
 
                 if (!tagData->composer.isEmpty())
-                    tag->itemMap().value("\xA9wrt", TagLib::StringList(TagLib::String(tagData->composer.toUtf8().data(), TagLib::String::UTF8)));
+                    tag->setItem("\xA9wrt", TagLib::StringList(TagLib::String(tagData->composer.toUtf8().data(), TagLib::String::UTF8)));
 
                 if (tagData->trackTotal > 0)
-                    tag->itemMap().value("trkn", TagLib::MP4::Item(tagData->track, tagData->trackTotal));
+                    tag->setItem("trkn", TagLib::MP4::Item(tagData->track, tagData->trackTotal));
 
                 if (tagData->disc > 0) {
                     if (tagData->discTotal > 0)
-                        tag->itemMap().value("disk", TagLib::MP4::Item(tagData->disc, tagData->discTotal));
+                        tag->setItem("disk", TagLib::MP4::Item(tagData->disc, tagData->discTotal));
                     else
-                        tag->itemMap().value("disk", TagLib::MP4::Item(tagData->disc));
+                        tag->setItem("disk", TagLib::MP4::Item(tagData->disc));
                 }
 
                 if (!tagData->musicBrainzTrackId.isEmpty())
-                    tag->itemMap().value("----:com.apple.iTunes:MusicBrainz Track Id", TagLib::StringList(TagLib::String(tagData->musicBrainzTrackId.toUtf8().data(), TagLib::String::UTF8)));
+                    tag->setItem("----:com.apple.iTunes:MusicBrainz Track Id", TagLib::StringList(TagLib::String(tagData->musicBrainzTrackId.toUtf8().data(), TagLib::String::UTF8)));
 
                 if (!tagData->musicBrainzReleaseId.isEmpty())
-                    tag->itemMap().value("----:com.apple.iTunes:MusicBrainz Album Id", TagLib::StringList(TagLib::String(tagData->musicBrainzReleaseId.toUtf8().data(), TagLib::String::UTF8)));
+                    tag->setItem("----:com.apple.iTunes:MusicBrainz Album Id", TagLib::StringList(TagLib::String(tagData->musicBrainzReleaseId.toUtf8().data(), TagLib::String::UTF8)));
             }
         } else if (TagLib::ASF::File *file = dynamic_cast<TagLib::ASF::File *>(fileref.file())) {
             if (TagLib::ASF::Tag *tag = file->tag()) {
@@ -1113,7 +1113,7 @@ bool TagEngine::writeCovers(const QUrl &fileName, QList<CoverData *> covers)
 
                     coversList.append(TagLib::MP4::CoverArt(format, TagLib::ByteVector(cover->data.data(), cover->data.size())));
                 }
-                tag->itemMap().value("covr", TagLib::MP4::Item(coversList));
+                tag->setItem("covr", TagLib::MP4::Item(coversList));
             }
 
             return fileref.save();
