@@ -29,15 +29,15 @@ AftenCodecWidget::AftenCodecWidget()
     cMode = new KComboBox(this);
     cMode->addItem(i18n("Quality"));
     cMode->addItem(i18n("Bitrate"));
-    connect(cMode, SIGNAL(activated(int)), this, SLOT(modeChanged(int)));
-    connect(cMode, SIGNAL(activated(int)), SIGNAL(optionsChanged()));
+    connect(cMode, &QComboBox::activated, this, &AftenCodecWidget::modeChanged);
+    connect(cMode, &QComboBox::activated, this, &CodecWidget::optionsChanged);
     topBox->addWidget(cMode);
 
     sQuality = new QSlider(Qt::Horizontal, this);
     sQuality->setRange(0, 1023);
     sQuality->setSingleStep(10);
-    connect(sQuality, SIGNAL(valueChanged(int)), this, SLOT(qualitySliderChanged(int)));
-    connect(sQuality, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(sQuality, &QAbstractSlider::valueChanged, this, &AftenCodecWidget::qualitySliderChanged);
+    connect(sQuality, &QAbstractSlider::valueChanged, this, &CodecWidget::optionsChanged);
     topBox->addWidget(sQuality);
     sQuality->setToolTip(
         i18n("Quality level from %1 to %2 where %2 is the highest quality.\nThe higher the quality, the bigger the file size and vice versa.", 0, 1023));
@@ -47,8 +47,8 @@ AftenCodecWidget::AftenCodecWidget()
     dQuality->setSingleStep(1);
     dQuality->setSuffix("");
     dQuality->setFixedWidth(dQuality->sizeHint().width());
-    connect(dQuality, SIGNAL(valueChanged(int)), this, SLOT(qualitySpinBoxChanged(int)));
-    connect(dQuality, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(dQuality, &QSpinBox::valueChanged, this, &AftenCodecWidget::qualitySpinBoxChanged);
+    connect(dQuality, &QSpinBox::valueChanged, this, &CodecWidget::optionsChanged);
     topBox->addWidget(dQuality);
     dQuality->setToolTip(
         i18n("Quality level from %1 to %2 where %2 is the highest quality.\nThe higher the quality, the bigger the file size and vice versa.", 0, 1023));
@@ -74,7 +74,7 @@ AftenCodecWidget::AftenCodecWidget()
     cBitrate->addItem("576 kbps");
     cBitrate->addItem("640 kbps");
     cBitrate->hide();
-    connect(cBitrate, SIGNAL(activated(int)), SIGNAL(optionsChanged()));
+    connect(cBitrate, &QComboBox::activated, this, &CodecWidget::optionsChanged);
     topBox->addWidget(cBitrate);
 
     topBox->addStretch();

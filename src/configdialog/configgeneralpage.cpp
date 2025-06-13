@@ -56,7 +56,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cStartTab->addItem(i18n("Detailed"));
     cStartTab->setCurrentIndex(config->data.general.startTab);
     startTabBox->addWidget(cStartTab);
-    connect(cStartTab, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cStartTab, &KComboBox::activated, this, &ConfigGeneralPage::somethingChanged);
 
     box->addSpacing(spacingSmall);
 
@@ -79,14 +79,14 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cDefaultProfile->addItems(sDefaultProfile);
     cDefaultProfile->setCurrentIndex(cDefaultProfile->findText(config->data.general.defaultProfile));
     defaultProfileBox->addWidget(cDefaultProfile);
-    connect(cDefaultProfile, SIGNAL(activated(int)), this, SLOT(profileChanged()));
-    connect(cDefaultProfile, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cDefaultProfile, &KComboBox::activated, this, &ConfigGeneralPage::profileChanged);
+    connect(cDefaultProfile, &KComboBox::activated, this, &ConfigGeneralPage::somethingChanged);
     QLabel *lDefaultFormat = new QLabel(i18n("Default format:"), this);
     defaultProfileBox->addWidget(lDefaultFormat);
     cDefaultFormat = new KComboBox(this);
     cDefaultFormat->setCurrentIndex(cDefaultFormat->findText(config->data.general.defaultFormat));
     defaultProfileBox->addWidget(cDefaultFormat);
-    connect(cDefaultFormat, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cDefaultFormat, &KComboBox::activated, this, &ConfigGeneralPage::somethingChanged);
     profileChanged();
 
     box->addSpacing(spacingBig);
@@ -123,7 +123,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cConflictHandling->setToolTip(i18n("Do that if the output file already exists"));
     cConflictHandling->setCurrentIndex((int)config->data.general.conflictHandling);
     conflictHandlingBox->addWidget(cConflictHandling);
-    connect(cConflictHandling, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cConflictHandling, &QComboBox::activated, this, &ConfigGeneralPage::somethingChanged);
 
     box->addSpacing(spacingSmall);
 
@@ -139,7 +139,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     iNumFiles->setRange(1, 100);
     iNumFiles->setValue(config->data.general.numFiles);
     numFilesBox->addWidget(iNumFiles);
-    connect(iNumFiles, SIGNAL(valueChanged(int)), this, SLOT(somethingChanged()));
+    connect(iNumFiles, &QSpinBox::valueChanged, this, &ConfigGeneralPage::somethingChanged);
     numFilesBox->setStretch(0, 3);
     numFilesBox->setStretch(1, 1);
 
@@ -152,7 +152,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cWaitForAlbumGain->setToolTip(i18n("Keep songs of the same album waiting in file list in order to apply album gain to all files."));
     cWaitForAlbumGain->setChecked(config->data.general.waitForAlbumGain);
     waitForAlbumGainBox->addWidget(cWaitForAlbumGain);
-    connect(cWaitForAlbumGain, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cWaitForAlbumGain, &QAbstractButton::toggled, this, &ConfigGeneralPage::somethingChanged);
 
     box->addSpacing(spacingSmall);
 
@@ -163,7 +163,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cCopyIfSameCodec->setToolTip(i18n("If the input and the output file format are the same, copy the files instead of re-encoding them."));
     cCopyIfSameCodec->setChecked(config->data.general.copyIfSameCodec);
     copyIfSameCodecBox->addWidget(cCopyIfSameCodec);
-    connect(cCopyIfSameCodec, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cCopyIfSameCodec, &QAbstractButton::toggled, this, &ConfigGeneralPage::somethingChanged);
 
     box->addSpacing(spacingBig);
 
@@ -184,7 +184,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     cReplayGainGrouping->addItem(i18nc("Group files in the Replay Gain tool by", "Directories only"));
     cReplayGainGrouping->setCurrentIndex((int)config->data.general.replayGainGrouping);
     replayGainGroupingBox->addWidget(cReplayGainGrouping);
-    connect(cReplayGainGrouping, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cReplayGainGrouping, &QComboBox::activated, this, &ConfigGeneralPage::somethingChanged);
 
     box->addSpacing(spacingSmall);
 
@@ -200,7 +200,7 @@ ConfigGeneralPage::ConfigGeneralPage(Config *_config, QWidget *parent)
     iNumReplayGainFiles->setRange(1, 100);
     iNumReplayGainFiles->setValue(config->data.general.numReplayGainFiles);
     numReplayGainFilesBox->addWidget(iNumReplayGainFiles);
-    connect(iNumReplayGainFiles, SIGNAL(valueChanged(int)), this, SLOT(somethingChanged()));
+    connect(iNumReplayGainFiles, &QSpinBox::valueChanged, this, &ConfigGeneralPage::somethingChanged);
     numReplayGainFilesBox->setStretch(0, 3);
     numReplayGainFilesBox->setStretch(1, 1);
 

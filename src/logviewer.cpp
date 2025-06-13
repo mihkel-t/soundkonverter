@@ -26,8 +26,8 @@ LogViewer::LogViewer(Logger *_logger, QWidget *parent, Qt::WindowFlags f)
 {
     const int fontHeight = QFontMetrics(QApplication::font()).boundingRect("M").size().height();
 
-    connect(logger, SIGNAL(removedProcess(int)), this, SLOT(processRemoved(int)));
-    connect(logger, SIGNAL(updateProcess(int)), this, SLOT(updateProcess(int)));
+    connect(logger, &Logger::removedProcess, this, &LogViewer::processRemoved);
+    connect(logger, &Logger::updateProcess, this, &LogViewer::updateProcess);
 
     setWindowTitle(i18nc("@title:window", "Log Viewer"));
     setWindowIcon(QIcon::fromTheme("view-list-text"));
@@ -42,7 +42,7 @@ LogViewer::LogViewer(Logger *_logger, QWidget *parent, Qt::WindowFlags f)
     cItem = new KComboBox(this);
     topBox->addWidget(cItem);
     topBox->setStretchFactor(cItem, 1);
-    connect(cItem, SIGNAL(activated(int)), this, SLOT(itemChanged()));
+    connect(cItem, &QComboBox::activated, this, &LogViewer::itemChanged);
 
     kLog = new QTextEdit(this);
     box->addWidget(kLog);

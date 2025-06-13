@@ -115,6 +115,7 @@ private slots:
 
 public slots:
     // connected to soundKonverterView
+    void openFiles(const QList<QUrl> &files, ConversionOptions *conversionOptions);
     void addFiles(const QList<QUrl> &fileList,
                   ConversionOptions *conversionOptions,
                   const QString &notifyCommand = "",

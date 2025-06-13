@@ -47,7 +47,6 @@ public:
 
     void addConvertFiles(const QList<QUrl> &urls, QString _profile, QString _format, const QString &directory, const QString &notifyCommand = "");
     void loadAutosaveFileList();
-    void loadFileList(const QString &fileListPath);
 
     QAction *start()
     {
@@ -69,18 +68,18 @@ Q_SIGNALS:
     //     void signalChangeCaption( const QString& text );
 
 public slots:
-    bool
-    showCdDialog(const QString &device = "", QString _profile = "", QString _format = "", const QString &directory = "", const QString &notifyCommand = "");
+    bool showCdDialog(const QString &device = "", QString _profile = "", QString _format = "", const QString &directory = "", const QString &notifyCommand = "");
     void loadFileList(bool user = true);
     void saveFileList(bool user = true);
     void updateFileList();
+    void loadFileList(const QString &fileListPath);
+    void showPlaylistDialog();
+    void showUrlDialog();
+    void showDirDialog();
+    void showFileDialog();
 
 private slots:
     void addClicked(int index);
-    void showFileDialog();
-    void showDirDialog();
-    void showUrlDialog();
-    void showPlaylistDialog();
 
     // connected to fileList
     /** The count of items in the file list has changed to @p count */

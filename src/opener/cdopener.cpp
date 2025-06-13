@@ -50,12 +50,12 @@ PlayerWidget::PlayerWidget(Phonon::MediaObject *mediaObject, int _track, QTreeWi
     pStartPlayback = new QPushButton(QIcon::fromTheme("media-playback-start"), "", this);
     pStartPlayback->setFixedSize(1.5 * fontHeight, 1.5 * fontHeight);
     trackPlayerBox->addWidget(pStartPlayback);
-    connect(pStartPlayback, SIGNAL(clicked()), this, SLOT(startPlaybackClicked()));
+    connect(pStartPlayback, &QAbstractButton::clicked, this, &PlayerWidget::startPlaybackClicked);
     pStopPlayback = new QPushButton(QIcon::fromTheme("media-playback-stop"), "", this);
     pStopPlayback->setFixedSize(1.5 * fontHeight, 1.5 * fontHeight);
     pStopPlayback->hide();
     trackPlayerBox->addWidget(pStopPlayback);
-    connect(pStopPlayback, SIGNAL(clicked()), this, SLOT(stopPlaybackClicked()));
+    connect(pStopPlayback, &QAbstractButton::clicked, this, &PlayerWidget::stopPlaybackClicked);
     seekSlider = new Phonon::SeekSlider(this);
     seekSlider->setMediaObject(mediaObject);
     seekSlider->setIconVisible(false);
@@ -164,7 +164,7 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     topGridLayout->addWidget(lArtistLabel, 0, 0);
     lArtist = new KLineEdit(cdOpenerWidget);
     topGridLayout->addWidget(lArtist, 0, 1);
-    connect(lArtist, SIGNAL(textChanged(const QString &)), this, SLOT(artistChanged(const QString &)));
+    connect(lArtist, &QLineEdit::textChanged, this, &CDOpener::artistChanged);
 
     // set up the second row at the top
     QLabel *lAlbumLabel = new QLabel(i18n("Album:"), cdOpenerWidget);
@@ -232,7 +232,7 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     trackList->header()->setSectionResizeMode(Column_Composer, QHeaderView::ResizeToContents);
     trackList->header()->setSectionResizeMode(Column_Title, QHeaderView::ResizeToContents);
     //     trackList->setMouseTracking( true );
-    connect(trackList, SIGNAL(itemSelectionChanged()), this, SLOT(trackChanged()));
+    connect(trackList, &QTreeWidget::itemSelectionChanged, this, &CDOpener::trackChanged);
     //     connect( trackList, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(itemHighlighted(QTreeWidgetItem*,int)) );
     gridLayout->setRowStretch(1, 1);
 
@@ -246,13 +246,13 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     pTrackUp->setIcon(QIcon::fromTheme("arrow-up"));
     pTrackUp->setFixedSize(pTrackUp->sizeHint().height(), pTrackUp->sizeHint().height());
     pTrackUp->setAutoRepeat(true);
-    connect(pTrackUp, SIGNAL(clicked()), this, SLOT(trackUpPressed()));
+    connect(pTrackUp, &QAbstractButton::clicked, this, &CDOpener::trackUpPressed);
     tagGridLayout->addWidget(pTrackUp, 0, 0);
     pTrackDown = new QPushButton("", tagGroupBox);
     pTrackDown->setIcon(QIcon::fromTheme("arrow-down"));
     pTrackDown->setFixedSize(pTrackDown->sizeHint().height(), pTrackDown->sizeHint().height());
     pTrackDown->setAutoRepeat(true);
-    connect(pTrackDown, SIGNAL(clicked()), this, SLOT(trackDownPressed()));
+    connect(pTrackDown, &QAbstractButton::clicked, this, &CDOpener::trackDownPressed);
     tagGridLayout->addWidget(pTrackDown, 1, 0);
 
     setTabOrder(pTrackDown, pTrackUp);
@@ -266,13 +266,13 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     tagGridLayout->addWidget(lTrackTitleLabel, 0, 1);
     lTrackTitle = new KLineEdit(tagGroupBox);
     trackTitleBox->addWidget(lTrackTitle);
-    connect(lTrackTitle, SIGNAL(textChanged(const QString &)), this, SLOT(trackTitleChanged(const QString &)));
+    connect(lTrackTitle, &QLineEdit::textChanged, this, &CDOpener::trackTitleChanged);
     pTrackTitleEdit = new QPushButton(tagGroupBox);
     pTrackTitleEdit->setIcon(QIcon::fromTheme("document-edit"));
     pTrackTitleEdit->setFixedSize(lTrackTitle->sizeHint().height(), lTrackTitle->sizeHint().height());
     pTrackTitleEdit->hide();
     trackTitleBox->addWidget(pTrackTitleEdit);
-    connect(pTrackTitleEdit, SIGNAL(clicked()), this, SLOT(editTrackTitleClicked()));
+    connect(pTrackTitleEdit, &QPushButton::clicked, this, &CDOpener::editTrackTitleClicked);
     // add a horizontal box layout for the composer
     QHBoxLayout *trackArtistBox = new QHBoxLayout();
     tagGridLayout->addLayout(trackArtistBox, 1, 2);
@@ -281,24 +281,24 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     tagGridLayout->addWidget(lTrackArtistLabel, 1, 1);
     lTrackArtist = new KLineEdit(tagGroupBox);
     trackArtistBox->addWidget(lTrackArtist);
-    connect(lTrackArtist, SIGNAL(textChanged(const QString &)), this, SLOT(trackArtistChanged(const QString &)));
+    connect(lTrackArtist, &QLineEdit::textChanged, this, &CDOpener::trackArtistChanged);
     pTrackArtistEdit = new QPushButton("", tagGroupBox);
     pTrackArtistEdit->setIcon(QIcon::fromTheme("document-edit"));
     pTrackArtistEdit->setFixedSize(lTrackArtist->sizeHint().height(), lTrackArtist->sizeHint().height());
     pTrackArtistEdit->hide();
     trackArtistBox->addWidget(pTrackArtistEdit);
-    connect(pTrackArtistEdit, SIGNAL(clicked()), this, SLOT(editTrackArtistClicked()));
+    connect(pTrackArtistEdit, &QPushButton::clicked, this, &CDOpener::editTrackArtistClicked);
     QLabel *lTrackComposerLabel = new QLabel(i18n("Composer:"), tagGroupBox);
     trackArtistBox->addWidget(lTrackComposerLabel);
     lTrackComposer = new KLineEdit(tagGroupBox);
     trackArtistBox->addWidget(lTrackComposer);
-    connect(lTrackComposer, SIGNAL(textChanged(const QString &)), this, SLOT(trackComposerChanged(const QString &)));
+    connect(lTrackComposer, &QLineEdit::textChanged, this, &CDOpener::trackComposerChanged);
     pTrackComposerEdit = new QPushButton("", tagGroupBox);
     pTrackComposerEdit->setIcon(QIcon::fromTheme("document-edit"));
     pTrackComposerEdit->setFixedSize(lTrackComposer->sizeHint().height(), lTrackComposer->sizeHint().height());
     pTrackComposerEdit->hide();
     trackArtistBox->addWidget(pTrackComposerEdit);
-    connect(pTrackComposerEdit, SIGNAL(clicked()), this, SLOT(editTrackComposerClicked()));
+    connect(pTrackComposerEdit, &QPushButton::clicked, this, &CDOpener::editTrackComposerClicked);
     // add a horizontal box layout for the comment
     QHBoxLayout *trackCommentBox = new QHBoxLayout();
     tagGridLayout->addLayout(trackCommentBox, 2, 2);
@@ -308,13 +308,13 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     tTrackComment = new QTextEdit(tagGroupBox);
     trackCommentBox->addWidget(tTrackComment);
     tTrackComment->setFixedHeight(4 * fontHeight);
-    connect(tTrackComment, SIGNAL(textChanged()), this, SLOT(trackCommentChanged()));
+    connect(tTrackComment, &QTextEdit::textChanged, this, &CDOpener::trackCommentChanged);
     pTrackCommentEdit = new QPushButton("", tagGroupBox);
     pTrackCommentEdit->setIcon(QIcon::fromTheme("document-edit"));
     pTrackCommentEdit->setFixedSize(lTrackTitle->sizeHint().height(), lTrackTitle->sizeHint().height());
     pTrackCommentEdit->hide();
     trackCommentBox->addWidget(pTrackCommentEdit);
-    connect(pTrackCommentEdit, SIGNAL(clicked()), this, SLOT(editTrackCommentClicked()));
+    connect(pTrackCommentEdit, &QPushButton::clicked, this, &CDOpener::editTrackCommentClicked);
 
     audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
     audioOutput->setVolume(0.5);
@@ -326,8 +326,8 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     mediaController = new Phonon::MediaController(mediaObject);
     mediaController->setAutoplayTitles(false);
 
-    connect(mediaController, SIGNAL(titleChanged(int)), this, SLOT(playbackTitleChanged(int)));
-    connect(mediaObject, SIGNAL(stateChanged(Phonon::State, Phonon::State)), this, SLOT(playbackStateChanged(Phonon::State, Phonon::State)));
+    connect(mediaController, &Phonon::MediaController::titleChanged, this, &CDOpener::playbackTitleChanged);
+    connect(mediaObject, &Phonon::MediaObject::stateChanged, this, &CDOpener::playbackStateChanged);
 
     // Cd Opener Overlay Widget
 
@@ -369,12 +369,12 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
     // add the control elements
     pSaveCue = new QPushButton(QIcon::fromTheme("document-save"), i18n("Save cue sheet..."), this);
     controlBox->addWidget(pSaveCue);
-    connect(pSaveCue, SIGNAL(clicked()), this, SLOT(saveCuesheetClicked()));
+    connect(pSaveCue, &QAbstractButton::clicked, this, &CDOpener::saveCuesheetClicked);
     controlBox->addSpacing(fontHeight);
 
     pCDDB = new QPushButton(QIcon::fromTheme("download"), i18n("Request CDDB"), this);
     controlBox->addWidget(pCDDB);
-    connect(pCDDB, SIGNAL(clicked()), this, SLOT(requestCddb()));
+    connect(pCDDB, &QAbstractButton::clicked, this, &CDOpener::requestCddb);
     controlBox->addStretch();
 
     cEntireCd = new QCheckBox(i18n("Rip entire CD to one file"), this);
@@ -399,24 +399,24 @@ CDOpener::CDOpener(Config *_config, const QString &_device, QWidget *parent, Qt:
 
     pProceed = new QPushButton(QIcon::fromTheme("go-next"), i18n("Proceed"), this);
     controlBox->addWidget(pProceed);
-    connect(pProceed, SIGNAL(clicked()), this, SLOT(proceedClicked()));
+    connect(pProceed, &QPushButton::clicked, this, &CDOpener::proceedClicked);
     pAdd = new QPushButton(QIcon::fromTheme("dialog-ok"), i18n("Ok"), this);
     controlBox->addWidget(pAdd);
     pAdd->hide();
-    connect(pAdd, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(pAdd, &QPushButton::clicked, this, &CDOpener::addClicked);
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), this);
     controlBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pCancel, &QPushButton::clicked, this, &QDialog::reject);
 
-    connect(&fadeTimer, SIGNAL(timeout()), this, SLOT(fadeAnim()));
+    connect(&fadeTimer, &QTimer::timeout, this, &CDOpener::fadeAnim);
     fadeAlpha = 255.0f;
 
     cddb = new KCDDB::Client();
-    connect(cddb, SIGNAL(finished(KCDDB::Result)), this, SLOT(lookup_cddb_done(KCDDB::Result)));
+    connect(cddb, &KCDDB::Client::finished, this, &CDOpener::lookup_cddb_done);
 
     // set up timeout timer
     timeoutTimer.setSingleShot(true);
-    connect(&timeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    connect(&timeoutTimer, &QTimer::timeout, this, &CDOpener::timeout);
 
     if (!_device.isEmpty()) {
         device = _device;
@@ -608,8 +608,8 @@ bool CDOpener::openCdDevice(const QString &_device)
         QTreeWidgetItem *item = new QTreeWidgetItem(trackList, data);
         PlayerWidget *playerWidget = new PlayerWidget(mediaObject, newTags->track, item, this);
         //         playerWidget->hide();
-        connect(playerWidget, SIGNAL(startPlayback(int)), this, SLOT(startPlayback(int)));
-        connect(playerWidget, SIGNAL(stopPlayback()), this, SLOT(stopPlayback()));
+        connect(playerWidget, &PlayerWidget::startPlayback, this, &CDOpener::startPlayback);
+        connect(playerWidget, &PlayerWidget::stopPlayback, this, &CDOpener::stopPlayback);
         playerWidgets.append(playerWidget);
         trackList->setItemWidget(item, Column_Player, playerWidget);
         item->setCheckState(0, Qt::Checked);
@@ -747,7 +747,7 @@ void CDOpener::trackUpPressed()
     if (!item)
         return;
 
-    disconnect(trackList, SIGNAL(itemSelectionChanged()), 0, 0); // avoid backfireing
+    disconnect(trackList, &QTreeWidget::itemSelectionChanged, 0, 0); // avoid backfireing
 
     for (int i = 0; i < selectedTracks.count(); i++) {
         QTreeWidgetItem *item = trackList->topLevelItem(selectedTracks.at(i) - 1);
@@ -758,7 +758,7 @@ void CDOpener::trackUpPressed()
     item->setSelected(true);
     trackList->scrollToItem(item);
 
-    connect(trackList, SIGNAL(itemSelectionChanged()), this, SLOT(trackChanged()));
+    connect(trackList, &QTreeWidget::itemSelectionChanged, this, &CDOpener::trackChanged);
 
     trackChanged();
 }
@@ -770,7 +770,7 @@ void CDOpener::trackDownPressed()
     if (!item)
         return;
 
-    disconnect(trackList, SIGNAL(itemSelectionChanged()), 0, 0); // avoid backfireing
+    disconnect(trackList, &QTreeWidget::itemSelectionChanged, 0, 0); // avoid backfireing
 
     for (int i = 0; i < selectedTracks.count(); i++) {
         QTreeWidgetItem *item = trackList->topLevelItem(selectedTracks.at(i) - 1);
@@ -781,7 +781,7 @@ void CDOpener::trackDownPressed()
     item->setSelected(true);
     trackList->scrollToItem(item);
 
-    connect(trackList, SIGNAL(itemSelectionChanged()), this, SLOT(trackChanged()));
+    connect(trackList, &QTreeWidget::itemSelectionChanged, this, &CDOpener::trackChanged);
 
     trackChanged();
 }

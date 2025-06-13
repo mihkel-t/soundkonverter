@@ -34,7 +34,7 @@ BackendsListWidget::BackendsListWidget(const QString &_name, Config *_config, QW
     auto box = new QVBoxLayout(this);
 
     lBackends = new QListWidget(this);
-    connect(lBackends, SIGNAL(currentRowChanged(int)), this, SLOT(itemSelected(int)));
+    connect(lBackends, &QListWidget::currentRowChanged, this, &BackendsListWidget::itemSelected);
     box->addWidget(lBackends);
 
     QHBoxLayout *arrowBox = new QHBoxLayout();
@@ -44,21 +44,21 @@ BackendsListWidget::BackendsListWidget(const QString &_name, Config *_config, QW
     pUp->setIcon(QIcon::fromTheme("arrow-up"));
     pUp->setAutoRaise(true);
     pUp->setEnabled(false);
-    connect(pUp, SIGNAL(clicked()), this, SLOT(up()));
+    connect(pUp, &QToolButton::clicked, this, &BackendsListWidget::up);
     arrowBox->addWidget(pUp);
 
     pDown = new QToolButton(this);
     pDown->setIcon(QIcon::fromTheme("arrow-down"));
     pDown->setAutoRaise(true);
     pDown->setEnabled(false);
-    connect(pDown, SIGNAL(clicked()), this, SLOT(down()));
+    connect(pUp, &QToolButton::clicked, this, &BackendsListWidget::up);
     arrowBox->addWidget(pDown);
 
     pConfigure = new QToolButton(this);
     pConfigure->setIcon(QIcon::fromTheme("configure"));
     pConfigure->setAutoRaise(true);
     pConfigure->setEnabled(false);
-    connect(pConfigure, SIGNAL(clicked()), this, SLOT(configure()));
+    connect(pConfigure, &QToolButton::clicked, this, &BackendsListWidget::configure);
     arrowBox->addWidget(pConfigure);
 
     pInfo = new QToolButton(this);
@@ -66,7 +66,7 @@ BackendsListWidget::BackendsListWidget(const QString &_name, Config *_config, QW
     pInfo->setAutoRaise(true);
     pInfo->setEnabled(false);
     arrowBox->addWidget(pInfo);
-    connect(pInfo, SIGNAL(clicked()), this, SLOT(info()));
+    connect(pInfo, &QToolButton::clicked, this, &BackendsListWidget::info);
 }
 
 BackendsListWidget::~BackendsListWidget()
@@ -246,14 +246,14 @@ ConfigBackendsPage::ConfigBackendsPage(Config *_config, QWidget *parent)
     }
     ripperBox->addWidget(cSelectorRipper);
     ripperBox->setStretchFactor(cSelectorRipper, 1);
-    connect(cSelectorRipper, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
-    connect(cSelectorRipper, SIGNAL(activated(const QString &)), this, SLOT(ripperChanged(const QString &)));
+    connect(cSelectorRipper, &KComboBox::activated, this, &ConfigBackendsPage::somethingChanged);
+    connect(cSelectorRipper, &KComboBox::textActivated, this, &ConfigBackendsPage::ripperChanged);
     pConfigureRipper = new QPushButton(QIcon::fromTheme("configure"), "", this);
     pConfigureRipper->setFixedSize(cSelectorRipper->sizeHint().height(), cSelectorRipper->sizeHint().height());
     pConfigureRipper->setFlat(true);
     ripperBox->addWidget(pConfigureRipper);
     ripperBox->setStretchFactor(pConfigureRipper, 1);
-    connect(pConfigureRipper, SIGNAL(clicked()), this, SLOT(configureRipper()));
+    connect(pConfigureRipper, &QPushButton::clicked, this, &ConfigBackendsPage::configureRipper);
 
     box->addSpacing(spacingBig);
 
@@ -279,13 +279,13 @@ ConfigBackendsPage::ConfigBackendsPage(Config *_config, QWidget *parent)
         newCheckBox->setChecked(config->data.backends.enabledFilters.contains(filterPluginName));
         filterGrid->addWidget(newCheckBox, row, 1);
         filterCheckBoxes.append(newCheckBox);
-        connect(newCheckBox, SIGNAL(stateChanged(int)), this, SLOT(somethingChanged()));
+        connect(newCheckBox, &QCheckBox::checkStateChanged, this, &ConfigBackendsPage::somethingChanged);
 
         QPushButton *newConfigButton = new QPushButton(QIcon::fromTheme("configure"), "", this);
         newConfigButton->setFixedSize(cSelectorRipper->sizeHint().height(), cSelectorRipper->sizeHint().height());
         newConfigButton->setFlat(true);
         filterGrid->addWidget(newConfigButton, row, 2);
-        connect(newConfigButton, SIGNAL(clicked()), this, SLOT(configureFilter()));
+        connect(newConfigButton, &QCheckBox::clicked, this, &ConfigBackendsPage::configureFilter);
         filterConfigButtons.append(newConfigButton);
 
         FilterPlugin *plugin = qobject_cast<FilterPlugin *>(config->pluginLoader()->backendPluginByName(filterPluginName));
@@ -328,7 +328,7 @@ ConfigBackendsPage::ConfigBackendsPage(Config *_config, QWidget *parent)
     cSelectorFormat->removeItem(cSelectorFormat->findText("wav"));
     cSelectorFormat->removeItem(cSelectorFormat->findText("audio cd"));
     formatSelectorBox->addWidget(cSelectorFormat);
-    connect(cSelectorFormat, SIGNAL(activated(const QString &)), this, SLOT(formatChanged(const QString &)));
+    connect(cSelectorFormat, &QComboBox::textActivated, this, [=](const QString &str){ this->formatChanged(str); });
     formatSelectorBox->addStretch();
 
     QHBoxLayout *formatBackendsBox = new QHBoxLayout();
@@ -336,13 +336,13 @@ ConfigBackendsPage::ConfigBackendsPage(Config *_config, QWidget *parent)
     formatBox->addLayout(formatBackendsBox);
     decoderList = new BackendsListWidget(i18n("Decoder"), config, this);
     formatBackendsBox->addWidget(decoderList);
-    connect(decoderList, SIGNAL(orderChanged()), this, SLOT(somethingChanged()));
+    connect(decoderList, &BackendsListWidget::orderChanged, this, &ConfigBackendsPage::somethingChanged);
     encoderList = new BackendsListWidget(i18n("Encoder"), config, this);
     formatBackendsBox->addWidget(encoderList);
-    connect(encoderList, SIGNAL(orderChanged()), this, SLOT(somethingChanged()));
+    connect(encoderList, &BackendsListWidget::orderChanged, this, &ConfigBackendsPage::somethingChanged);
     replaygainList = new BackendsListWidget(i18n("Replay Gain"), config, this);
     formatBackendsBox->addWidget(replaygainList);
-    connect(replaygainList, SIGNAL(orderChanged()), this, SLOT(somethingChanged()));
+    connect(replaygainList, &BackendsListWidget::orderChanged, this, &ConfigBackendsPage::somethingChanged);
 
     QHBoxLayout *optimizationsBox = new QHBoxLayout();
     optimizationsBox->addSpacing(spacingOffset);
@@ -350,7 +350,7 @@ ConfigBackendsPage::ConfigBackendsPage(Config *_config, QWidget *parent)
     optimizationsBox->addStretch();
     pShowOptimizations = new QPushButton(QIcon::fromTheme("games-solve"), i18n("Show possible optimizations"), this);
     optimizationsBox->addWidget(pShowOptimizations);
-    connect(pShowOptimizations, SIGNAL(clicked()), this, SLOT(showOptimizations()));
+    connect(pShowOptimizations, &QPushButton::clicked, this, &ConfigBackendsPage::showOptimizations);
     optimizationsBox->addStretch();
 
     box->addStretch(2);
@@ -568,10 +568,7 @@ void ConfigBackendsPage::showOptimizations()
     QList<CodecOptimizations::Optimization> optimizationList = config->getOptimizations(true);
     if (!optimizationList.isEmpty()) {
         CodecOptimizations *optimizationsDialog = new CodecOptimizations(optimizationList, this);
-        connect(optimizationsDialog,
-                SIGNAL(solutions(const QList<CodecOptimizations::Optimization> &)),
-                config,
-                SLOT(doOptimizations(const QList<CodecOptimizations::Optimization> &)));
+        connect(optimizationsDialog, &CodecOptimizations::solutions, config, &Config::doOptimizations);
         optimizationsDialog->exec();
     } else {
         KMessageBox::information(this, i18n("All backend settings seem to be optimal, there is nothing to do."));

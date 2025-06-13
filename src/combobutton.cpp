@@ -19,12 +19,12 @@ ComboButton::ComboButton(QWidget *parent)
 
     m_box = new KComboBox(this);
     grid->addWidget(m_box, 0, 0);
-    connect(m_box, SIGNAL(activated(int)), this, SLOT(boxActivated(int)));
+    connect(m_box, &KComboBox::activated, this, &ComboButton::boxActivated);
     setFocusProxy(m_box);
 
     m_button = new QPushButton(QString(), this);
     grid->addWidget(m_button, 0, 0);
-    connect(m_button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
+    connect(m_button, &QPushButton::clicked, this, &ComboButton::buttonClicked);
     m_iconHight = m_button->iconSize().height();
 
     //     m_sizeMode = Max;

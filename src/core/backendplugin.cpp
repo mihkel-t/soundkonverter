@@ -457,7 +457,7 @@ void BackendPlugin::processOutput()
 {
     for (int i = 0; i < backendItems.size(); i++) {
         if (backendItems.at(i)->process == QObject::sender()) {
-            const QString output = backendItems.at(i)->process->readAllStandardOutput().data();
+            const QString output = backendItems.at(i)->process->readAllStandardOutput().constData();
 
             const float progress = parseOutput(output);
 

@@ -43,10 +43,10 @@ OptionsLayer::OptionsLayer(Config *config, QWidget *parent)
     buttonBox->addStretch();
     pOk = new QPushButton(QIcon::fromTheme("dialog-ok"), i18n("Ok"), this);
     buttonBox->addWidget(pOk);
-    connect(pOk, SIGNAL(clicked()), this, SLOT(ok()));
+    connect(pOk, &QPushButton::clicked, this, &OptionsLayer::ok);
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), this);
     buttonBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(abort()));
+    connect(pCancel, &QPushButton::clicked, this, &OptionsLayer::abort);
 
     palette = options->palette();
     brush = palette.window();
@@ -55,7 +55,7 @@ OptionsLayer::OptionsLayer(Config *config, QWidget *parent)
 
     setAutoFillBackground(true);
 
-    connect(&fadeTimer, SIGNAL(timeout()), this, SLOT(fadeAnim()));
+    connect(&fadeTimer, &QTimer::timeout, this, &OptionsLayer::fadeAnim);
     fadeAlpha = 0.0f;
 }
 

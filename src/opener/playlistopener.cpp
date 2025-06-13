@@ -50,10 +50,10 @@ PlaylistOpener::PlaylistOpener(Config *_config, QWidget *parent, Qt::WindowFlags
 
     pAdd = new QPushButton(QIcon::fromTheme("dialog-ok"), i18n("Ok"), this);
     controlBox->addWidget(pAdd);
-    connect(pAdd, SIGNAL(clicked()), this, SLOT(okClickedSlot()));
+    connect(pAdd, &QAbstractButton::clicked, this, &PlaylistOpener::okClickedSlot);
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), this);
     controlBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pCancel, &QAbstractButton::clicked, this, &QDialog::reject);
 
     // Prevent the dialog from beeing too wide because of the directory history
     if (parent && width() > parent->width())

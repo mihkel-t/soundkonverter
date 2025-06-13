@@ -128,7 +128,7 @@ DirOpener::DirOpener(Config *_config, Mode _mode, QWidget *parent, Qt::WindowFla
 
     fileTypesFormatsBox->addWidget(fileTypes);
     QLabel *formatHelp = new QLabel("<a href=\"format-help\">" + i18n("Are you missing some file formats?") + "</a>", this);
-    connect(formatHelp, SIGNAL(linkActivated(const QString &)), this, SLOT(showHelp()));
+    connect(formatHelp, &QLabel::linkActivated, this, &DirOpener::showHelp);
     fileTypesFormatsBox->addWidget(formatHelp);
 
     QVBoxLayout *fileTypesButtonsBox = new QVBoxLayout();
@@ -137,11 +137,11 @@ DirOpener::DirOpener(Config *_config, Mode _mode, QWidget *parent, Qt::WindowFla
 
     pSelectAll = new QPushButton(QIcon::fromTheme("edit-select-all"), i18n("Select all"), dirOpenerWidget);
     fileTypesButtonsBox->addWidget(pSelectAll);
-    connect(pSelectAll, SIGNAL(clicked()), this, SLOT(selectAllClicked()));
+    connect(pSelectAll, &QPushButton::clicked, this, &DirOpener::selectAllClicked);
 
     pSelectNone = new QPushButton(QIcon::fromTheme("application-x-zerosize"), i18n("Select none"), dirOpenerWidget);
     fileTypesButtonsBox->addWidget(pSelectNone);
-    connect(pSelectNone, SIGNAL(clicked()), this, SLOT(selectNoneClicked()));
+    connect(pSelectNone, &QPushButton::clicked, this, &DirOpener::selectNoneClicked);
 
     cRecursive = new QCheckBox(i18n("Recursive"), dirOpenerWidget);
     cRecursive->setChecked(true);

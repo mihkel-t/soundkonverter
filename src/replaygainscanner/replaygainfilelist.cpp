@@ -60,11 +60,11 @@ ReplayGainFileList::ReplayGainFileList(Config *_config, Logger *_logger, QWidget
 
     collapseAction = new QAction(QIcon::fromTheme("view-process-all"), i18n("Collapse all"), this);
     collapseAction->setShortcut(Qt::CTRL | Qt::Key_Minus);
-    connect(collapseAction, SIGNAL(triggered()), this, SLOT(collapseAll()));
+    connect(collapseAction, &QAction::triggered, this, &QTreeView::collapseAll);
     addAction(collapseAction);
     expandAction = new QAction(QIcon::fromTheme("view-process-all-tree"), i18n("Expand all"), this);
     expandAction->setShortcut(Qt::CTRL | Qt::Key_Plus);
-    connect(expandAction, SIGNAL(triggered()), this, SLOT(expandAll()));
+    connect(expandAction, &QAction::triggered, this, &QTreeView::expandAll);
     addAction(expandAction);
     //     processAddAction = new QAction( QIcon::fromTheme("list-add"), i18n("Calculate Replay Gain"), this );
     //     connect( processAddAction, SIGNAL(triggered()), this, SLOT(processAddSelectedItems()) );
@@ -73,16 +73,16 @@ ReplayGainFileList::ReplayGainFileList(Config *_config, Logger *_logger, QWidget
     //     killAction = new QAction( QIcon::fromTheme("process-stop"), i18n("Stop calculation"), this );
     //     connect( killAction, SIGNAL(triggered()), this, SLOT(killSelectedItems()) );
     moveAction = new QAction(QIcon("folder-new"), i18n("Move to new Album"), this);
-    connect(moveAction, SIGNAL(triggered()), this, SLOT(moveSelectedItems()));
+    connect(moveAction, &QAction::triggered, this, &ReplayGainFileList::moveSelectedItems);
     removeAction = new QAction(QIcon::fromTheme("edit-delete"), i18n("Remove"), this);
     removeAction->setShortcut(QKeySequence::Delete);
-    connect(removeAction, SIGNAL(triggered()), this, SLOT(removeSelectedItems()));
+    connect(removeAction, &QAction::triggered, this, &ReplayGainFileList::removeSelectedItems);
     addAction(removeAction);
 
     contextMenu = new QMenu(this);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
+    connect(this, &QWidget::customContextMenuRequested, this, &ReplayGainFileList::showContextMenu);
 }
 
 ReplayGainFileList::~ReplayGainFileList()

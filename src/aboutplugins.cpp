@@ -34,7 +34,7 @@ AboutPlugins::AboutPlugins(Config *_config, QWidget *parent, Qt::WindowFlags f)
 
     QListWidget *pluginsList = new QListWidget(this);
     pluginListBox->addWidget(pluginsList);
-    connect(pluginsList, SIGNAL(currentTextChanged(const QString &)), this, SLOT(currentPluginChanged(const QString &)));
+    connect(pluginsList, &QListWidget::currentTextChanged, this, &AboutPlugins::currentPluginChanged);
 
     QStringList pluginNames;
     QList<CodecPlugin *> codecPlugins = config->pluginLoader()->getAllCodecPlugins();
@@ -80,7 +80,7 @@ AboutPlugins::AboutPlugins(Config *_config, QWidget *parent, Qt::WindowFlags f)
     aboutPluginLabel->setWordWrap(true);
     aboutPluginLabel->setTextFormat(Qt::RichText);
     pluginInfoBox->addWidget(aboutPluginLabel);
-    connect(aboutPluginLabel, SIGNAL(linkActivated(const QString &)), this, SLOT(showProblemInfo(const QString &)));
+     connect(aboutPluginLabel, &QLabel::linkActivated, this, &AboutPlugins::showProblemInfo);
 
     pluginInfoBox->addStretch();
 
@@ -90,7 +90,7 @@ AboutPlugins::AboutPlugins(Config *_config, QWidget *parent, Qt::WindowFlags f)
     configurePlugin->hide();
     configurePluginBox->addWidget(configurePlugin);
     configurePluginBox->addStretch();
-    connect(configurePlugin, SIGNAL(clicked()), this, SLOT(configurePluginClicked()));
+     connect(configurePlugin, &QPushButton::clicked, this, &AboutPlugins::configurePluginClicked);
 
     pluginsList->setCurrentRow(0);
     QListWidgetItem *currentItem = pluginsList->currentItem();

@@ -50,7 +50,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
     cPreferredOggVorbisExtension->addItem("oga");
     cPreferredOggVorbisExtension->setCurrentIndex(config->data.general.preferredOggVorbisExtension == "ogg" ? 0 : 1);
     preferredOggVorbisExtensionBox->addWidget(cPreferredOggVorbisExtension);
-    connect(cPreferredOggVorbisExtension, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cPreferredOggVorbisExtension, &KComboBox::activated, this, &ConfigAdvancedPage::somethingChanged);
     preferredOggVorbisExtensionBox->setStretch(0, 3);
     preferredOggVorbisExtensionBox->setStretch(1, 1);
 
@@ -72,7 +72,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
     cPreferredVorbisCommentCommentTag->addItem("DESCRIPTION");
     cPreferredVorbisCommentCommentTag->setCurrentIndex(config->data.general.preferredVorbisCommentCommentTag == "COMMENT" ? 0 : 1);
     preferredVorbisCommentCommentTagBox->addWidget(cPreferredVorbisCommentCommentTag);
-    connect(cPreferredVorbisCommentCommentTag, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cPreferredVorbisCommentCommentTag, &KComboBox::activated, this, &ConfigAdvancedPage::somethingChanged);
     preferredVorbisCommentCommentTagBox->setStretch(0, 3);
     preferredVorbisCommentCommentTagBox->setStretch(1, 1);
 
@@ -96,7 +96,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
     cPreferredVorbisCommentTrackTotalTag->setCurrentIndex(
         cPreferredVorbisCommentTrackTotalTag->findText(config->data.general.preferredVorbisCommentTrackTotalTag));
     preferredVorbisCommentTrackTotalTagBox->addWidget(cPreferredVorbisCommentTrackTotalTag);
-    connect(cPreferredVorbisCommentTrackTotalTag, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cPreferredVorbisCommentTrackTotalTag, &KComboBox::activated, this, &ConfigAdvancedPage::somethingChanged);
     preferredVorbisCommentTrackTotalTagBox->setStretch(0, 3);
     preferredVorbisCommentTrackTotalTagBox->setStretch(1, 1);
 
@@ -120,7 +120,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
     cPreferredVorbisCommentDiscTotalTag->setCurrentIndex(
         cPreferredVorbisCommentDiscTotalTag->findText(config->data.general.preferredVorbisCommentDiscTotalTag));
     preferredVorbisCommentDiscTotalTagBox->addWidget(cPreferredVorbisCommentDiscTotalTag);
-    connect(cPreferredVorbisCommentDiscTotalTag, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cPreferredVorbisCommentDiscTotalTag, &KComboBox::activated, this, &ConfigAdvancedPage::somethingChanged);
     preferredVorbisCommentDiscTotalTagBox->setStretch(0, 3);
     preferredVorbisCommentDiscTotalTagBox->setStretch(1, 1);
 
@@ -135,7 +135,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
              "automatically be used independently from this option."));
     cUseVFATNames->setChecked(config->data.general.useVFATNames);
     useVFATNamesBox->addWidget(cUseVFATNames);
-    connect(cUseVFATNames, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cUseVFATNames, &QCheckBox::toggled, this, &ConfigAdvancedPage::somethingChanged);
 
     box->addSpacing(spacingSmall);
 
@@ -145,7 +145,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
     cEjectCdAfterRip = new QCheckBox(i18n("Eject CD after ripping has been completed"), this);
     cEjectCdAfterRip->setChecked(config->data.advanced.ejectCdAfterRip);
     ejectCdAfterRipBox->addWidget(cEjectCdAfterRip);
-    connect(cEjectCdAfterRip, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cEjectCdAfterRip, &QCheckBox::toggled, this, &ConfigAdvancedPage::somethingChanged);
 
     box->addSpacing(spacingBig);
 
@@ -165,7 +165,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
              QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/soundkonverter/log/"));
     cWriteLogFiles->setChecked(config->data.general.writeLogFiles);
     writeLogFilesBox->addWidget(cWriteLogFiles);
-    connect(cWriteLogFiles, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cWriteLogFiles, &QCheckBox::toggled, this, &ConfigAdvancedPage::somethingChanged);
 
     box->addSpacing(spacingBig);
 
@@ -195,9 +195,9 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
         cUseSharedMemoryForTempFiles->setToolTip(i18n("It seems there's no filesystem mounted on /dev/shm"));
     }
     iMaxSizeForSharedMemoryTempFiles->setEnabled(cUseSharedMemoryForTempFiles->isChecked());
-    connect(cUseSharedMemoryForTempFiles, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
-    connect(cUseSharedMemoryForTempFiles, SIGNAL(toggled(bool)), iMaxSizeForSharedMemoryTempFiles, SLOT(setEnabled(bool)));
-    connect(iMaxSizeForSharedMemoryTempFiles, SIGNAL(valueChanged(int)), this, SLOT(somethingChanged()));
+    connect(cUseSharedMemoryForTempFiles, &QCheckBox::toggled, this, &ConfigAdvancedPage::somethingChanged);
+    connect(cUseSharedMemoryForTempFiles, &QCheckBox::toggled, iMaxSizeForSharedMemoryTempFiles, &QSpinBox::setEnabled);
+    connect(iMaxSizeForSharedMemoryTempFiles, &QSpinBox::valueChanged, this, &ConfigAdvancedPage::somethingChanged);
     useSharedMemoryForTempFilesBox->setStretch(0, 3);
     useSharedMemoryForTempFilesBox->setStretch(1, 1);
 
@@ -212,7 +212,7 @@ ConfigAdvancedPage::ConfigAdvancedPage(Config *_config, QWidget *parent)
              "cautious."));
     cUsePipes->setChecked(config->data.advanced.usePipes);
     usePipesBox->addWidget(cUsePipes);
-    connect(cUsePipes, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cUsePipes, &QCheckBox::toggled, this, &ConfigAdvancedPage::somethingChanged);
 
     box->addStretch();
 }

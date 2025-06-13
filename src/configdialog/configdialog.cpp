@@ -36,33 +36,33 @@ ConfigDialog::ConfigDialog(Config *_config, QWidget *parent /*, Page startPage*/
     backendsPageChanged = false;
     buttonBox()->button(QDialogButtonBox::Apply)->setEnabled(false);
 
-    connect(button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(applyClicked()));
-    connect(button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(okClicked()));
-    connect(button(QDialogButtonBox::RestoreDefaults), SIGNAL(clicked()), this, SLOT(defaultClicked()));
+    connect(button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &ConfigDialog::applyClicked);
+    connect(button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &ConfigDialog::okClicked);
+    connect(button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this, &ConfigDialog::defaultClicked);
 
     configGeneralPage = new ConfigGeneralPage(config, this);
     generalPage = addPage(qobject_cast<QWidget *>(configGeneralPage), i18n("General"));
     generalPage->setHeader("");
     generalPage->setIcon(QIcon::fromTheme("configure"));
-    connect(configGeneralPage, SIGNAL(configChanged(bool)), this, SLOT(configChanged(bool)));
+    connect(configGeneralPage, &ConfigGeneralPage::configChanged, this, &ConfigDialog::configChanged);
 
     configAdvancedPage = new ConfigAdvancedPage(config, this);
     advancedPage = addPage(qobject_cast<QWidget *>(configAdvancedPage), i18n("Advanced"));
     advancedPage->setHeader("");
     advancedPage->setIcon(QIcon::fromTheme("preferences-desktop-gaming"));
-    connect(configAdvancedPage, SIGNAL(configChanged(bool)), this, SLOT(configChanged(bool)));
+    connect(configAdvancedPage, &ConfigAdvancedPage::configChanged, this, &ConfigDialog::configChanged);
 
     configCoverArtPage = new ConfigCoverArtPage(config, this);
     coverArtPage = addPage(qobject_cast<QWidget *>(configCoverArtPage), i18n("Cover art"));
     coverArtPage->setHeader("");
     coverArtPage->setIcon(QIcon::fromTheme("image-x-generic"));
-    connect(configCoverArtPage, SIGNAL(configChanged(bool)), this, SLOT(configChanged(bool)));
+    connect(configCoverArtPage, &ConfigCoverArtPage::configChanged, this, &ConfigDialog::configChanged);
 
     configBackendsPage = new ConfigBackendsPage(config, this);
     backendsPage = addPage(qobject_cast<QWidget *>(configBackendsPage), i18n("Backends"));
     backendsPage->setHeader("");
     backendsPage->setIcon(QIcon::fromTheme("applications-system"));
-    connect(configBackendsPage, SIGNAL(configChanged(bool)), this, SLOT(configChanged(bool)));
+    connect(configBackendsPage, &ConfigBackendsPage::configChanged, this, &ConfigDialog::configChanged);
 
     lastUseVFATNames = config->data.general.useVFATNames;
     lastConflictHandling = (int)config->data.general.conflictHandling;

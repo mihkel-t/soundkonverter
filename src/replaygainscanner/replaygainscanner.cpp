@@ -49,28 +49,28 @@ ReplayGainScanner::ReplayGainScanner(Config *_config, Logger *_logger, bool show
     cAdd->insertItem(QIcon::fromTheme("folder"), i18n("Add folder..."));
     cAdd->insertItem(QIcon::fromTheme("audio-x-generic"), i18n("Add files..."));
     filterBox->addWidget(cAdd);
-    connect(cAdd, SIGNAL(clicked(int)), this, SLOT(addClicked(int)));
+    connect(cAdd, &ComboButton::clicked, this, &ReplayGainScanner::addClicked);
 
     filterBox->addStretch();
 
     pShowMainWindow = new QPushButton(QIcon::fromTheme("soundkonverter"), i18n("Show soundKonverter main window"), widget);
     pShowMainWindow->setVisible(showMainWindowButton);
     filterBox->addWidget(pShowMainWindow);
-    connect(pShowMainWindow, SIGNAL(clicked()), this, SLOT(showMainWindowClicked()));
+    connect(pShowMainWindow, &QPushButton::clicked, this, &ReplayGainScanner::showMainWindowClicked);
 
     fileList = new ReplayGainFileList(config, logger, widget);
     grid->addWidget(fileList, 1, 0);
-    connect(fileList, SIGNAL(processStarted()), this, SLOT(processStarted()));
-    connect(fileList, SIGNAL(processStopped()), this, SLOT(processStopped()));
+    connect(fileList, &ReplayGainFileList::processStarted, this, &ReplayGainScanner::processStarted);
+    connect(fileList, &ReplayGainFileList::processStopped, this, &ReplayGainScanner::processStopped);
 
     QHBoxLayout *progressBox = new QHBoxLayout();
     grid->addLayout(progressBox, 2, 0);
 
     progressIndicator = new ProgressIndicator(this);
     progressBox->addWidget(progressIndicator);
-    connect(fileList, SIGNAL(timeChanged(float)), progressIndicator, SLOT(timeChanged(float)));
-    connect(fileList, SIGNAL(finished(bool)), progressIndicator, SLOT(finished(bool)));
-    connect(progressIndicator, SIGNAL(progressChanged(const QString &)), this, SLOT(progressChanged(const QString &)));
+    connect(fileList, &ReplayGainFileList::timeChanged, progressIndicator, &ProgressIndicator::timeChanged);
+    connect(fileList, &ReplayGainFileList::finished, progressIndicator, &ProgressIndicator::finished);
+    connect(progressIndicator, &ProgressIndicator::progressChanged, this, &ReplayGainScanner::progressChanged);
 
     QHBoxLayout *buttonBox = new QHBoxLayout();
     grid->addLayout(buttonBox, 3, 0);
@@ -78,17 +78,17 @@ ReplayGainScanner::ReplayGainScanner(Config *_config, Logger *_logger, bool show
     pTagVisible = new QPushButton(QIcon::fromTheme("list-add"), i18n("Tag untagged"), widget);
     pTagVisible->setToolTip(i18n("Calculate Replay Gain tags for all files in the file list without Replay Gain tags."));
     buttonBox->addWidget(pTagVisible);
-    connect(pTagVisible, SIGNAL(clicked()), this, SLOT(calcReplayGainClicked()));
+    connect(pTagVisible, &QPushButton::clicked, this, &ReplayGainScanner::calcReplayGainClicked);
 
     pRemoveTag = new QPushButton(QIcon::fromTheme("list-remove"), i18n("Untag tagged"), widget);
     pRemoveTag->setToolTip(i18n("Remove the Replay Gain tags from all files in the file list."));
     buttonBox->addWidget(pRemoveTag);
-    connect(pRemoveTag, SIGNAL(clicked()), this, SLOT(removeReplayGainClicked()));
+    connect(pRemoveTag, &QAbstractButton::clicked, this, &ReplayGainScanner::removeReplayGainClicked);
 
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), widget);
     pCancel->hide();
     buttonBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(pCancel, &QPushButton::clicked, this, &ReplayGainScanner::cancelClicked);
 
     cForce = new QCheckBox(i18n("Force recalculation"), this);
     cForce->setToolTip(i18n("Recalculate Replay Gain tags for files that already have Replay Gain tags set."));
@@ -99,24 +99,18 @@ ReplayGainScanner::ReplayGainScanner(Config *_config, Logger *_logger, bool show
     pClose = new QPushButton(QIcon::fromTheme("dialog-close"), i18n("Close"), widget);
     pClose->setFocus();
     buttonBox->addWidget(pClose);
-    connect(pClose, SIGNAL(clicked()), this, SLOT(closeClicked()));
+    connect(pClose, &QAbstractButton::clicked, this, &ReplayGainScanner::closeClicked);
 
     ReplayGainProcessor *replayGainProcessor = new ReplayGainProcessor(config, fileList, logger);
-    connect(fileList,
-            SIGNAL(processItem(ReplayGainFileListItem *, ReplayGainPlugin::ApplyMode)),
-            replayGainProcessor,
-            SLOT(add(ReplayGainFileListItem *, ReplayGainPlugin::ApplyMode)));
-    connect(fileList, SIGNAL(killItem(ReplayGainFileListItem *)), replayGainProcessor, SLOT(kill(ReplayGainFileListItem *)));
-    connect(replayGainProcessor,
-            SIGNAL(finished(ReplayGainFileListItem *, ReplayGainFileListItem::ReturnCode)),
-            fileList,
-            SLOT(itemFinished(ReplayGainFileListItem *, ReplayGainFileListItem::ReturnCode)));
-    connect(replayGainProcessor, SIGNAL(updateItem(ReplayGainFileListItem *, bool)), fileList, SLOT(updateItem(ReplayGainFileListItem *, bool)));
+    connect(fileList, &ReplayGainFileList::processItem, replayGainProcessor, &ReplayGainProcessor::add);
+    connect(fileList, &ReplayGainFileList::killItem, replayGainProcessor, &ReplayGainProcessor::kill);
+    connect(replayGainProcessor, &ReplayGainProcessor::finished, fileList, &ReplayGainFileList::itemFinished);
+    connect(replayGainProcessor, &ReplayGainProcessor::updateItem, fileList, &ReplayGainFileList::updateItem);
 
-    connect(replayGainProcessor, SIGNAL(finishedProcess(int, bool)), logger, SLOT(processCompleted(int, bool)));
+    connect(replayGainProcessor, &ReplayGainProcessor::finishedProcess, logger, [=](int id, bool succeeded) { logger->processCompleted(id, succeeded); });
 
-    connect(replayGainProcessor, SIGNAL(updateTime(float)), progressIndicator, SLOT(update(float)));
-    connect(replayGainProcessor, SIGNAL(timeFinished(float)), progressIndicator, SLOT(timeFinished(float)));
+    connect(replayGainProcessor, &ReplayGainProcessor::updateTime, progressIndicator, &ProgressIndicator::update);
+    connect(replayGainProcessor, &ReplayGainProcessor::timeFinished, progressIndicator, &ProgressIndicator::timeFinished);
 
     resize(QSize(60 * fontHeight, 40 * fontHeight));
     readConfig();
@@ -268,11 +262,11 @@ void ReplayGainScanner::showDirDialog()
     DirOpener *dialog = new DirOpener(config, DirOpener::ReplayGain, this);
 
     if (!dialog->dialogAborted) {
-        connect(dialog, SIGNAL(openFiles(const QUrl &, bool, const QStringList &)), fileList, SLOT(addDir(const QUrl &, bool, const QStringList &)));
+        connect(dialog, &DirOpener::openFiles, fileList, &ReplayGainFileList::addDir);
 
         dialog->exec();
 
-        disconnect(dialog, SIGNAL(openFiles(const QUrl &, bool, const QStringList &)), 0, 0);
+        disconnect(dialog, &DirOpener::openFiles, 0, 0);
     }
 
     delete dialog;

@@ -40,18 +40,18 @@ OptionsSimple::OptionsSimple(Config *_config, /*OptionsDetailed* _optionsDetaile
     grid->addLayout(topBoxQuality, 0, 1);
     cProfile = new KComboBox(this);
     topBoxQuality->addWidget(cProfile);
-    connect(cProfile, SIGNAL(activated(int)), this, SLOT(profileChanged()));
+    connect(cProfile, &QComboBox::activated, this, &OptionsSimple::profileChanged);
     topBoxQuality->addSpacing(0.25 * fontHeight);
     pProfileRemove = new QPushButton(QIcon::fromTheme("edit-delete"), i18n("Remove"), this);
     topBoxQuality->addWidget(pProfileRemove);
     pProfileRemove->setToolTip(i18n("Remove the selected profile"));
     pProfileRemove->hide();
-    connect(pProfileRemove, SIGNAL(clicked()), this, SLOT(profileRemove()));
+    connect(pProfileRemove, &QPushButton::clicked, this, &OptionsSimple::profileRemove);
     pProfileInfo = new QPushButton(QIcon::fromTheme("dialog-information"), i18n("Info"), this);
     topBoxQuality->addWidget(pProfileInfo);
     pProfileInfo->setToolTip(i18n("Information about the selected profile"));
     //     cProfile->setFixedHeight( pProfileInfo->minimumSizeHint().height() );
-    connect(pProfileInfo, SIGNAL(clicked()), this, SLOT(profileInfo()));
+    connect(pProfileInfo, &QPushButton::clicked, this, &OptionsSimple::profileInfo);
     topBoxQuality->addStretch();
 
     topBoxQuality->addSpacing(fontHeight);
@@ -64,17 +64,17 @@ OptionsSimple::OptionsSimple(Config *_config, /*OptionsDetailed* _optionsDetaile
     cFormat = new KComboBox(this);
     topBoxFormat->addWidget(cFormat);
     //     connect( cFormat, SIGNAL(activated(int)), this, SLOT(formatChanged()) );
-    connect(cFormat, SIGNAL(activated(int)), this, SLOT(somethingChanged()));
+    connect(cFormat, &QComboBox::activated, this, &OptionsSimple::somethingChanged);
     topBoxFormat->addSpacing(0.25 * fontHeight);
     pFormatInfo = new QPushButton(QIcon::fromTheme("dialog-information"), i18n("Info"), this);
     topBoxFormat->addWidget(pFormatInfo);
     pFormatInfo->setToolTip(i18n("Information about the selected file format"));
     //     cFormat->setFixedHeight( pFormatInfo->minimumSizeHint().height() );
-    connect(pFormatInfo, SIGNAL(clicked()), this, SLOT(formatInfo()));
+    connect(pFormatInfo, &QAbstractButton::clicked, this, &OptionsSimple::formatInfo);
     topBoxFormat->addSpacing(0.25 * fontHeight);
     QLabel *formatHelp = new QLabel("<a href=\"format-help\">" + i18n("More formats...") + "</a>", this);
     topBoxFormat->addWidget(formatHelp);
-    connect(formatHelp, SIGNAL(linkActivated(const QString &)), this, SLOT(showHelp()));
+    connect(formatHelp, &QLabel::linkActivated, this, &OptionsSimple::showHelp);
     topBoxFormat->addStretch();
 
     QLabel *lOutput = new QLabel(i18n("Destination:"), this);
@@ -84,8 +84,8 @@ OptionsSimple::OptionsSimple(Config *_config, /*OptionsDetailed* _optionsDetaile
     grid->addLayout(middleBox, 1, 1, 1, 3);
     outputDirectory = new OutputDirectory(config, this);
     middleBox->addWidget(outputDirectory);
-    connect(outputDirectory, SIGNAL(modeChanged(int)), this, SLOT(outputDirectoryChanged()));
-    connect(outputDirectory, SIGNAL(directoryChanged(const QString &)), this, SLOT(outputDirectoryChanged()));
+    connect(outputDirectory, &OutputDirectory::modeChanged, this, &OptionsSimple::outputDirectoryChanged);
+    connect(outputDirectory, &OutputDirectory::directoryChanged, this, &OptionsSimple::outputDirectoryChanged);
 
     QHBoxLayout *estimSizeBox = new QHBoxLayout();
     grid->addLayout(estimSizeBox, 2, 0);
@@ -101,7 +101,7 @@ OptionsSimple::OptionsSimple(Config *_config, /*OptionsDetailed* _optionsDetaile
     grid->addLayout(optionalBox, 3, 1);
     cReplayGain = new QCheckBox(i18n("Calculate Replay Gain tags"), this);
     optionalBox->addWidget(cReplayGain);
-    connect(cReplayGain, SIGNAL(toggled(bool)), this, SLOT(somethingChanged()));
+    connect(cReplayGain, &QAbstractButton::toggled, this, &OptionsSimple::somethingChanged);
     optionalBox->addStretch();
 
     QLabel *lInfo = new QLabel(text, this);

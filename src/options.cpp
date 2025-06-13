@@ -20,19 +20,19 @@ Options::Options(Config *_config, const QString &text, QWidget *parent)
 
     tab = new QTabWidget(this);
     gridLayout->addWidget(tab, 0, 0);
-    connect(tab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect(tab, &QTabWidget::currentChanged, this, &Options::tabChanged);
 
     optionsSimple = new OptionsSimple(config, text, this);
-    connect(optionsSimple, SIGNAL(optionsChanged()), this, SLOT(simpleOptionsChanged()));
-    connect(optionsSimple->outputDirectory, SIGNAL(modeChanged(int)), this, SLOT(simpleOutputDirectoryModeChanged(int)));
-    connect(optionsSimple->outputDirectory, SIGNAL(directoryChanged(const QString &)), this, SLOT(simpleOutputDirectoryChanged(const QString &)));
+    connect(optionsSimple, &OptionsSimple::optionsChanged, this, &Options::simpleOptionsChanged);
+    connect(optionsSimple->outputDirectory, &OutputDirectory::modeChanged, this, &Options::simpleOutputDirectoryModeChanged);
+    connect(optionsSimple->outputDirectory, &OutputDirectory::directoryChanged, this, &Options::simpleOutputDirectoryChanged);
 
     optionsDetailed = new OptionsDetailed(config, this);
-    connect(optionsDetailed->outputDirectory, SIGNAL(modeChanged(int)), this, SLOT(detailedOutputDirectoryModeChanged(int)));
-    connect(optionsDetailed, SIGNAL(currentDataRateChanged(int)), optionsSimple, SLOT(currentDataRateChanged(int)));
+    connect(optionsDetailed->outputDirectory, &OutputDirectory::modeChanged, this, &Options::detailedOutputDirectoryModeChanged);
+    connect(optionsDetailed, &OptionsDetailed::currentDataRateChanged, optionsSimple, &OptionsSimple::currentDataRateChanged);
 
-    connect(optionsDetailed, SIGNAL(customProfilesEdited()), optionsSimple, SLOT(updateProfiles()));
-    connect(optionsSimple, SIGNAL(customProfilesEdited()), optionsDetailed, SLOT(updateProfiles()));
+    connect(optionsDetailed, &OptionsDetailed::customProfilesEdited, optionsSimple, &OptionsSimple::updateProfiles);
+    connect(optionsSimple, &OptionsSimple::customProfilesEdited, optionsDetailed, &OptionsDetailed::updateProfiles);
 
     optionsSimple->init();
     optionsDetailed->init();
@@ -126,9 +126,9 @@ void Options::tabChanged(const int pageIndex)
 {
     if (pageIndex == 0) {
         // NOTE prevent signals from firing back
-        disconnect(optionsSimple, SIGNAL(optionsChanged()), 0, 0);
-        disconnect(optionsSimple->outputDirectory, SIGNAL(modeChanged(int)), 0, 0);
-        disconnect(optionsSimple->outputDirectory, SIGNAL(directoryChanged(const QString &)), 0, 0);
+        disconnect(optionsSimple, &OptionsSimple::optionsChanged, 0, 0);
+        disconnect(optionsSimple->outputDirectory, &OutputDirectory::modeChanged, 0, 0);
+        disconnect(optionsSimple->outputDirectory, &OutputDirectory::directoryChanged, 0, 0);
 
         optionsSimple->updateProfiles();
         optionsSimple->setCurrentProfile(optionsDetailed->currentProfile());
@@ -143,9 +143,9 @@ void Options::tabChanged(const int pageIndex)
         optionsSimple->outputDirectory->setMode(optionsDetailed->outputDirectory->mode());
         optionsSimple->outputDirectory->setDirectory(optionsDetailed->outputDirectory->directory());
 
-        connect(optionsSimple, SIGNAL(optionsChanged()), this, SLOT(simpleOptionsChanged()));
-        connect(optionsSimple->outputDirectory, SIGNAL(modeChanged(int)), this, SLOT(simpleOutputDirectoryModeChanged(int)));
-        connect(optionsSimple->outputDirectory, SIGNAL(directoryChanged(const QString &)), this, SLOT(simpleOutputDirectoryChanged(const QString &)));
+        connect(optionsSimple, &OptionsSimple::optionsChanged, this, &Options::simpleOptionsChanged);
+        connect(optionsSimple->outputDirectory, &OutputDirectory::modeChanged, this, &Options::simpleOutputDirectoryModeChanged);
+        connect(optionsSimple->outputDirectory, &OutputDirectory::directoryChanged, this, &Options::simpleOutputDirectoryChanged);
     }
 
     config->data.general.lastTab = tab->currentIndex();

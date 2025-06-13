@@ -48,10 +48,10 @@ soundKonverter::soundKonverter()
     config->load();
 
     m_view = new soundKonverterView(logger, config, cdManager, this);
-    connect(m_view, SIGNAL(signalConversionStarted()), this, SLOT(conversionStarted()));
-    connect(m_view, SIGNAL(signalConversionStopped(bool)), this, SLOT(conversionStopped(bool)));
-    connect(m_view, SIGNAL(progressChanged(const QString &)), this, SLOT(progressChanged(const QString &)));
-    connect(m_view, SIGNAL(showLog(int)), this, SLOT(showLogViewer(int)));
+    connect(m_view, &soundKonverterView::signalConversionStarted, this, &soundKonverter::conversionStarted);
+    connect(m_view, &soundKonverterView::signalConversionStopped, this, &soundKonverter::conversionStopped);
+    connect(m_view, &soundKonverterView::progressChanged, this, &soundKonverter::progressChanged);
+    connect(m_view, &soundKonverterView::showLog, this, &soundKonverter::showLogViewer);
 
     // tell the KXmlGuiWindow that this is indeed the main widget
     setCentralWidget(m_view);
@@ -122,52 +122,52 @@ void soundKonverter::setupActions()
     QAction *logviewer = actionCollection()->addAction("logviewer");
     logviewer->setText(i18n("View logs..."));
     logviewer->setIcon(QIcon::fromTheme("view-list-text"));
-    connect(logviewer, SIGNAL(triggered()), this, SLOT(showLogViewer()));
+    connect(logviewer, &QAction::triggered, this, &soundKonverter::showLogViewer);
 
     QAction *replaygainscanner = actionCollection()->addAction("replaygainscanner");
     replaygainscanner->setText(i18n("Replay Gain tool..."));
     replaygainscanner->setIcon(QIcon::fromTheme("soundkonverter-replaygain"));
-    connect(replaygainscanner, SIGNAL(triggered()), this, SLOT(showReplayGainScanner()));
+    connect(replaygainscanner, &QAction::triggered, this, &soundKonverter::showReplayGainScanner);
 
     QAction *aboutplugins = actionCollection()->addAction("aboutplugins");
     aboutplugins->setText(i18n("About plugins..."));
     aboutplugins->setIcon(QIcon::fromTheme("preferences-plugin"));
-    connect(aboutplugins, SIGNAL(triggered()), this, SLOT(showAboutPlugins()));
+    connect(aboutplugins, &QAction::triggered, this, &soundKonverter::showAboutPlugins);
 
     QAction *add_files = actionCollection()->addAction("add_files");
     add_files->setText(i18n("Add files..."));
     add_files->setIcon(QIcon::fromTheme("audio-x-generic"));
-    connect(add_files, SIGNAL(triggered()), m_view, SLOT(showFileDialog()));
+    connect(add_files, &QAction::triggered, m_view, &soundKonverterView::showFileDialog);
 
     QAction *add_folder = actionCollection()->addAction("add_folder");
     add_folder->setText(i18n("Add folder..."));
     add_folder->setIcon(QIcon::fromTheme("folder"));
-    connect(add_folder, SIGNAL(triggered()), m_view, SLOT(showDirDialog()));
+    connect(add_folder, &QAction::triggered, m_view, &soundKonverterView::showDirDialog);
 
     QAction *add_audiocd = actionCollection()->addAction("add_audiocd");
     add_audiocd->setText(i18n("Add CD tracks..."));
     add_audiocd->setIcon(QIcon::fromTheme("media-optical-audio"));
-    connect(add_audiocd, SIGNAL(triggered()), m_view, SLOT(showCdDialog()));
+    connect(add_audiocd, &QAction::triggered, m_view, [=](){ m_view->showCdDialog(); });
 
     QAction *add_url = actionCollection()->addAction("add_url");
     add_url->setText(i18n("Add url..."));
     add_url->setIcon(QIcon::fromTheme("network-workgroup"));
-    connect(add_url, SIGNAL(triggered()), m_view, SLOT(showUrlDialog()));
+    connect(add_url, &QAction::triggered, m_view, &soundKonverterView::showUrlDialog);
 
     QAction *add_playlist = actionCollection()->addAction("add_playlist");
     add_playlist->setText(i18n("Add playlist..."));
     add_playlist->setIcon(QIcon::fromTheme("view-media-playlist"));
-    connect(add_playlist, SIGNAL(triggered()), m_view, SLOT(showPlaylistDialog()));
+    connect(add_playlist, &QAction::triggered, m_view, &soundKonverterView::showPlaylistDialog);
 
     QAction *load = actionCollection()->addAction("load");
     load->setText(i18n("Load file list"));
     load->setIcon(QIcon::fromTheme("document-open"));
-    connect(load, SIGNAL(triggered()), m_view, SLOT(loadFileList()));
+    connect(load, &QAction::triggered, m_view, [=](){ m_view->loadFileList(); });
 
     QAction *save = actionCollection()->addAction("save");
     save->setText(i18n("Save file list"));
     save->setIcon(QIcon::fromTheme("document-save"));
-    connect(save, SIGNAL(triggered()), m_view, SLOT(saveFileList()));
+    connect(save, &QAction::triggered, m_view, &soundKonverterView::saveFileList);
 
     actionCollection()->addAction("start", m_view->start());
     actionCollection()->addAction("stop_menu", m_view->stopMenu());
@@ -283,10 +283,7 @@ void soundKonverter::startupChecks()
     QList<CodecOptimizations::Optimization> optimizationList = config->getOptimizations();
     if (!optimizationList.isEmpty()) {
         CodecOptimizations *optimizationsDialog = new CodecOptimizations(optimizationList, this);
-        connect(optimizationsDialog,
-                SIGNAL(solutions(const QList<CodecOptimizations::Optimization> &)),
-                config,
-                SLOT(doOptimizations(const QList<CodecOptimizations::Optimization> &)));
+        connect(optimizationsDialog, &CodecOptimizations::solutions, config, &Config::doOptimizations);
         optimizationsDialog->open();
     }
 }

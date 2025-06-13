@@ -39,12 +39,12 @@ ReplayGainProcessor::ReplayGainProcessor(Config *_config, ReplayGainFileList *_f
     , fileList(_fileList)
     , logger(_logger)
 {
-    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateProgress()));
+    connect(&updateTimer, &QTimer::timeout, this, &ReplayGainProcessor::updateProgress);
 
     QList<ReplayGainPlugin *> replaygainPlugins = config->pluginLoader()->getAllReplayGainPlugins();
     for (int i = 0; i < replaygainPlugins.size(); i++) {
-        connect(replaygainPlugins.at(i), SIGNAL(jobFinished(int, int)), this, SLOT(pluginProcessFinished(int, int)));
-        connect(replaygainPlugins.at(i), SIGNAL(log(int, const QString &)), this, SLOT(pluginLog(int, const QString &)));
+        connect(replaygainPlugins.at(i), &ReplayGainPlugin::jobFinished, this, &ReplayGainProcessor::pluginProcessFinished);
+        connect(replaygainPlugins.at(i), &ReplayGainPlugin::log, this, &ReplayGainProcessor::pluginLog);
     }
 }
 

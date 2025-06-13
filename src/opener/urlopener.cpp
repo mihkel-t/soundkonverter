@@ -80,14 +80,14 @@ UrlOpener::UrlOpener(Config *_config, QWidget *parent, Qt::WindowFlags f)
 
     pProceed = new QPushButton(QIcon::fromTheme("go-next"), i18n("Proceed"), this);
     controlBox->addWidget(pProceed);
-    connect(pProceed, SIGNAL(clicked()), this, SLOT(proceedClickedSlot()));
+    connect(pProceed, &QPushButton::clicked, this, &UrlOpener::proceedClickedSlot);
     pAdd = new QPushButton(QIcon::fromTheme("dialog-ok"), i18n("Ok"), this);
     controlBox->addWidget(pAdd);
     pAdd->hide();
-    connect(pAdd, SIGNAL(clicked()), this, SLOT(okClickedSlot()));
+    connect(pAdd, &QPushButton::clicked, this, &UrlOpener::okClickedSlot);
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), this);
     controlBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pCancel, &QPushButton::clicked, this, &QDialog::reject);
 
     // Prevent the dialog from beeing too wide because of the directory history
     if (parent && width() > parent->width())

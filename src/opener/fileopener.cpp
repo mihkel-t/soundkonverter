@@ -66,19 +66,19 @@ FileOpener::FileOpener(Config *_config, QWidget *parent, Qt::WindowFlags f)
 
     pAdd = new QPushButton(QIcon::fromTheme("dialog-ok"), i18n("Ok"), this);
     controlBox->addWidget(pAdd);
-    connect(pAdd, SIGNAL(clicked()), this, SLOT(okClickedSlot()));
+    connect(pAdd, &QPushButton::clicked, this, &FileOpener::okClickedSlot);
     pCancel = new QPushButton(QIcon::fromTheme("dialog-cancel"), i18n("Cancel"), this);
     controlBox->addWidget(pCancel);
-    connect(pCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(pCancel, &QPushButton::clicked, this, &QDialog::reject);
 
     // add the control elements
     formatHelp = new QLabel("<a href=\"format-help\">" + i18n("Are you missing some file formats?") + "</a>", this);
-    connect(formatHelp, SIGNAL(linkActivated(const QString &)), this, SLOT(showHelp()));
+    connect(formatHelp, &QLabel::linkActivated, this, &FileOpener::showHelp);
 
     fileDialog = new QFileDialog(this, i18nc("@title:window", "Add Files"), "kfiledialog:///soundkonverter-add-media", filterList.join("\n"));
     fileDialog->setFileMode(QFileDialog::ExistingFiles);
-    connect(fileDialog, SIGNAL(accepted()), this, SLOT(fileDialogAccepted()));
-    connect(fileDialog, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(fileDialog, &QDialog::accepted, this, &FileOpener::fileDialogAccepted);
+    connect(fileDialog, &QDialog::rejected, this, &QDialog::reject);
     const int dialogReturnCode = fileDialog->exec();
     if (dialogReturnCode == QDialog::Rejected)
         dialogAborted = true;

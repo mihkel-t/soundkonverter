@@ -4,6 +4,8 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KSharedConfig>
+#include <QDir>
+#include <QFileInfo>
 #include <QLocale>
 #include <QStandardPaths>
 
@@ -19,7 +21,7 @@ LoggerItem::LoggerItem(int logId, const QString &logIdentifier)
 {
     id = logId;
     identifier = logIdentifier;
-    file.setFileName(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + u"/soundkonverter/log/%1.log"_s.arg(id));
+    file.setFileName(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + u"/log/%1.log"_s.arg(id));
     completed = false;
     succeeded = false;
 }
@@ -44,9 +46,32 @@ Logger::Logger(QObject *parent)
     LoggerItem *item = new LoggerItem(1000, "soundKonverter");
     item->completed = true;
     item->succeeded = true;
+
+    qWarning("1");
+
     if (writeLogFiles) {
-        // TODO error handling
-        item->file.open(QIODevice::WriteOnly);
+        qWarning("2");
+
+        if(!item->file.open(QIODevice::WriteOnly))
+        {
+            QFileInfo fi(item->file.fileName());
+            QDir dir = fi.absoluteDir();
+
+            if(!dir.exists())
+            {
+                if(!dir.mkpath("."))
+                {
+                    qWarning("Failed to create directory '%s' for log file '%s'.", qUtf8Printable(dir.absolutePath()), qUtf8Printable(item->file.fileName()));
+                }else{
+                    qDebug("Created log directory '%s' for log file '%s'.", qUtf8Printable(dir.absolutePath()), qUtf8Printable(item->file.fileName()));
+                    item->file.open(QIODevice::WriteOnly);
+                }
+            }
+
+            if(!item->file.isOpen())
+                qWarning("Failed to open log file '%s'.", qUtf8Printable(item->file.fileName()));
+        }
+
         item->textStream.setDevice(&(item->file));
     }
 

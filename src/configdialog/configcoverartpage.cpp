@@ -47,8 +47,8 @@ ConfigCoverArtPage::ConfigCoverArtPage(Config *_config, QWidget *parent)
     writeCoversGroup->addButton(rWriteCoversAuto);
     writeCoversGroup->addButton(rWriteCoversNever);
 
-    connect(writeCoversGroup, SIGNAL(buttonClicked(QAbstractButton *)), this, SLOT(writeCoversChanged(QAbstractButton *)));
-    connect(writeCoversGroup, SIGNAL(buttonClicked(QAbstractButton *)), this, SLOT(somethingChanged()));
+    connect(writeCoversGroup, &QButtonGroup::buttonClicked, this, &ConfigCoverArtPage::writeCoversChanged);
+    connect(writeCoversGroup, &QButtonGroup::buttonClicked, this, &ConfigCoverArtPage::somethingChanged);
 
     if (config->data.coverArt.writeCovers == 0)
         rWriteCoversAlways->setChecked(true);
@@ -76,13 +76,13 @@ ConfigCoverArtPage::ConfigCoverArtPage(Config *_config, QWidget *parent)
     writeCoverNameTextBox->addWidget(lWriteCoverNameDefaultEdit);
     writeCoverNameTextBox->addStretch();
     writeCoversBox->addLayout(writeCoverNameTextBox);
-    connect(lWriteCoverNameDefaultEdit, SIGNAL(textChanged(QString)), this, SLOT(somethingChanged()));
+    connect(lWriteCoverNameDefaultEdit, &KLineEdit::textChanged, this, &ConfigCoverArtPage::somethingChanged);
 
     QButtonGroup *writeCoverNameGroup = new QButtonGroup(this);
     writeCoverNameGroup->addButton(rWriteCoverNameTitle);
     writeCoverNameGroup->addButton(rWriteCoverNameDefault);
 
-    connect(writeCoverNameGroup, SIGNAL(buttonClicked(QAbstractButton *)), this, SLOT(somethingChanged()));
+    connect(writeCoverNameGroup, &QButtonGroup::buttonClicked, this, &ConfigCoverArtPage::somethingChanged);
 
     if (config->data.coverArt.writeCoverName == 0)
         rWriteCoverNameTitle->setChecked(true);

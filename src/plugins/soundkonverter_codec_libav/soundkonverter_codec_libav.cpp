@@ -250,8 +250,8 @@ QList<ConversionPipeTrunk> soundkonverter_codec_libav::codecTable()
         if (libavInfo.lastModified() > libavLastModified || configVersion < version()) {
             infoProcess = new KProcess();
             infoProcess.data()->setOutputChannelMode(KProcess::MergedChannels);
-            connect(infoProcess.data(), SIGNAL(readyRead()), this, SLOT(infoProcessOutput()));
-            connect(infoProcess.data(), SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(infoProcessExit(int, QProcess::ExitStatus)));
+            connect(infoProcess.data(), &QProcess::readyRead, this, &soundkonverter_codec_libav::infoProcessOutput);
+            connect(infoProcess.data(), &QProcess::finished, this, &soundkonverter_codec_libav::infoProcessExit);
 
             QStringList command;
             command += binaries["avconv"];
@@ -475,8 +475,8 @@ int soundkonverter_codec_libav::convert(const QUrl &inputFile,
     newItem->id = lastId++;
     newItem->process = new KProcess(newItem);
     newItem->process->setOutputChannelMode(KProcess::MergedChannels);
-    connect(newItem->process, SIGNAL(readyRead()), this, SLOT(processOutput()));
-    connect(newItem->process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processExit(int, QProcess::ExitStatus)));
+    connect(newItem->process, &QProcess::readyRead, this, &soundkonverter_codec_libav::processOutput);
+    connect(newItem->process, &QProcess::finished, this, &soundkonverter_codec_libav::processExit);
 
     if (tags)
         newItem->data.length = tags->length;

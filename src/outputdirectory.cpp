@@ -39,22 +39,22 @@ OutputDirectory::OutputDirectory(Config *_config, QWidget *parent)
     cMode->addItem(i18n("Specify output directory"));
     cMode->addItem(i18n("Copy directory structure"));
     box->addWidget(cMode);
-    connect(cMode, SIGNAL(activated(int)), this, SLOT(modeChangedSlot(int)));
+    connect(cMode, &QComboBox::activated, this, &OutputDirectory::modeChangedSlot);
 
     cDir = new KComboBox(true, this);
     box->addWidget(cDir, 1);
-    connect(cDir, SIGNAL(editTextChanged(const QString &)), this, SLOT(directoryChangedSlot(const QString &)));
+    connect(cDir, &QComboBox::editTextChanged, this, &OutputDirectory::directoryChangedSlot);
 
     pDirSelect = new QPushButton(QIcon::fromTheme("folder"), "", this);
     box->addWidget(pDirSelect);
     pDirSelect->setFixedWidth(pDirSelect->height());
     pDirSelect->setToolTip(i18n("Choose an output directory"));
-    connect(pDirSelect, SIGNAL(clicked()), this, SLOT(selectDir()));
+    connect(pDirSelect, &QPushButton::clicked, this, &OutputDirectory::selectDir);
     pDirGoto = new QPushButton(QIcon::fromTheme("system-file-manager"), "", this);
     box->addWidget(pDirGoto);
     pDirGoto->setFixedWidth(pDirGoto->height());
     pDirGoto->setToolTip(i18n("Open the output directory with Dolphin"));
-    connect(pDirGoto, SIGNAL(clicked()), this, SLOT(gotoDir()));
+    connect(pDirGoto, &QPushButton::clicked, this, &OutputDirectory::gotoDir);
 
     setMode((OutputDirectory::Mode)config->data.general.lastOutputDirectoryMode);
 }
@@ -490,11 +490,11 @@ void OutputDirectory::modeChangedSlot(int mode)
 {
     config->data.general.lastOutputDirectoryMode = mode;
 
-    disconnect(cDir, SIGNAL(editTextChanged(const QString &)), 0, 0);
+    disconnect(cDir, &QComboBox::editTextChanged, 0, 0);
 
     updateMode((Mode)mode);
 
-    connect(cDir, SIGNAL(editTextChanged(const QString &)), this, SLOT(directoryChangedSlot(const QString &)));
+    connect(cDir, &QComboBox::editTextChanged, this, &OutputDirectory::directoryChangedSlot);
 
     emit modeChanged(mode);
 }

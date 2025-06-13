@@ -82,7 +82,6 @@ private slots:
     void processOutput();
 
     void configDialogSave();
-    void configDialogDefault();
 
     void infoProcessOutput();
     void infoProcessExit(int exitCode, QProcess::ExitStatus exitStatus);

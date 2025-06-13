@@ -23,27 +23,27 @@ Convert::Convert(Config *_config, FileList *_fileList, Logger *_logger, QObject 
     , fileList(_fileList)
     , logger(_logger)
 {
-    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateProgress()));
+    connect(&updateTimer, &QTimer::timeout, this, &Convert::updateProgress);
 
     QList<CodecPlugin *> codecPlugins = config->pluginLoader()->getAllCodecPlugins();
     for (int i = 0; i < codecPlugins.size(); i++) {
-        connect(codecPlugins.at(i), SIGNAL(jobFinished(int, int)), this, SLOT(pluginProcessFinished(int, int)));
-        connect(codecPlugins.at(i), SIGNAL(log(int, const QString &)), this, SLOT(pluginLog(int, const QString &)));
+        connect(codecPlugins.at(i), &CodecPlugin::jobFinished, this, &Convert::pluginProcessFinished);
+        connect(codecPlugins.at(i), &CodecPlugin::log, this, &Convert::pluginLog);
     }
     QList<FilterPlugin *> filterPlugins = config->pluginLoader()->getAllFilterPlugins();
     for (int i = 0; i < filterPlugins.size(); i++) {
-        connect(filterPlugins.at(i), SIGNAL(jobFinished(int, int)), this, SLOT(pluginProcessFinished(int, int)));
-        connect(filterPlugins.at(i), SIGNAL(log(int, const QString &)), this, SLOT(pluginLog(int, const QString &)));
+        connect(filterPlugins.at(i), &FilterPlugin::jobFinished, this, &Convert::pluginProcessFinished);
+        connect(filterPlugins.at(i), &FilterPlugin::log, this, &Convert::pluginLog);
     }
     QList<ReplayGainPlugin *> replaygainPlugins = config->pluginLoader()->getAllReplayGainPlugins();
     for (int i = 0; i < replaygainPlugins.size(); i++) {
-        connect(replaygainPlugins.at(i), SIGNAL(jobFinished(int, int)), this, SLOT(pluginProcessFinished(int, int)));
-        connect(replaygainPlugins.at(i), SIGNAL(log(int, const QString &)), this, SLOT(pluginLog(int, const QString &)));
+        connect(replaygainPlugins.at(i), &ReplayGainPlugin::jobFinished, this, &Convert::pluginProcessFinished);
+        connect(replaygainPlugins.at(i), &ReplayGainPlugin::log, this, &Convert::pluginLog);
     }
     QList<RipperPlugin *> ripperPlugins = config->pluginLoader()->getAllRipperPlugins();
     for (int i = 0; i < ripperPlugins.size(); i++) {
-        connect(ripperPlugins.at(i), SIGNAL(jobFinished(int, int)), this, SLOT(pluginProcessFinished(int, int)));
-        connect(ripperPlugins.at(i), SIGNAL(log(int, const QString &)), this, SLOT(pluginLog(int, const QString &)));
+        connect(ripperPlugins.at(i), &RipperPlugin::jobFinished, this, &Convert::pluginProcessFinished);
+        connect(ripperPlugins.at(i), &RipperPlugin::log, this, &Convert::pluginLog);
     }
 }
 
@@ -125,7 +125,7 @@ void Convert::convert(ConvertItem *item)
         logger->log(item->logID, i18n("Copying \"%1\" to \"%2\"", inputUrl.url(), item->outputUrl.toLocalFile()));
 
         item->kioCopyJob = KIO::file_copy(item->inputUrl, item->outputUrl, -1, KIO::HideProgressInfo);
-        connect(item->kioCopyJob.data(), SIGNAL(result(KJob *)), this, SLOT(kioJobFinished(KJob *)));
+        connect(item->kioCopyJob.data(), &KJob::result, this, &Convert::kioJobFinished);
         //         connect( item->kioCopyJob.data(), SIGNAL(percent(KJob*,unsigned long)), this, SLOT(kioJobProgress(KJob*,unsigned long)) );
 
         return;
@@ -267,8 +267,8 @@ void Convert::convert(ConvertItem *item)
             logger->log(item->logID, "<pre>\t<span style=\"color:#DC6300\">" + command + "</span></pre>");
             item->process = new KProcess();
             item->process.data()->setOutputChannelMode(KProcess::MergedChannels);
-            connect(item->process.data(), SIGNAL(readyRead()), this, SLOT(processOutput()));
-            connect(item->process.data(), SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processExit(int, QProcess::ExitStatus)));
+            connect(item->process.data(), &QIODevice::readyRead, this, &Convert::processOutput);
+            connect(item->process.data(), &QProcess::finished, this, &Convert::processExit);
             item->process.data()->clearProgram();
             item->process.data()->setShellCommand(command);
             item->process.data()->start();

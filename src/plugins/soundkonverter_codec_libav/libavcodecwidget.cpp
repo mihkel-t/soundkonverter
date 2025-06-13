@@ -33,8 +33,8 @@ LibavCodecWidget::LibavCodecWidget()
     sBitrate = new QSlider(Qt::Horizontal, this);
     sBitrate->setRange(8, 320);
     sBitrate->setValue(160);
-    connect(sBitrate, SIGNAL(valueChanged(int)), this, SLOT(qualitySliderChanged(int)));
-    connect(sBitrate, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(sBitrate, &QAbstractSlider::valueChanged, this, &LibavCodecWidget::qualitySliderChanged);
+    connect(sBitrate, &QAbstractSlider::valueChanged, this, &CodecWidget::optionsChanged);
     topBox->addWidget(sBitrate);
 
     iBitrate = new QSpinBox(this);
@@ -42,8 +42,8 @@ LibavCodecWidget::LibavCodecWidget()
     iBitrate->setValue(160);
     iBitrate->setSuffix(" kbps");
     iBitrate->setFixedWidth(iBitrate->sizeHint().width());
-    connect(iBitrate, SIGNAL(valueChanged(int)), this, SLOT(qualitySpinBoxChanged(int)));
-    connect(iBitrate, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(iBitrate, &QSpinBox::valueChanged, this, &LibavCodecWidget::qualitySpinBoxChanged);
+    connect(iBitrate, &QSpinBox::valueChanged, this, &CodecWidget::optionsChanged);
     topBox->addWidget(iBitrate);
 
     cBitrate = new KComboBox(this);
@@ -68,7 +68,7 @@ LibavCodecWidget::LibavCodecWidget()
     cBitrate->addItem("640 kbps");
     cBitrate->setCurrentIndex(10);
     cBitrate->hide();
-    connect(cBitrate, SIGNAL(activated(int)), SIGNAL(optionsChanged()));
+    connect(cBitrate, &QComboBox::activated, this, &CodecWidget::optionsChanged);
     topBox->addWidget(cBitrate);
 
     topBox->addStretch();
@@ -83,7 +83,7 @@ LibavCodecWidget::LibavCodecWidget()
     lCmdArguments = new KLineEdit(this);
     lCmdArguments->setEnabled(false);
     cmdArgumentsBox->addWidget(lCmdArguments);
-    connect(cCmdArguments, SIGNAL(toggled(bool)), lCmdArguments, SLOT(setEnabled(bool)));
+    connect(cCmdArguments, &QAbstractButton::toggled, lCmdArguments, &QWidget::setEnabled);
 
     grid->setRowStretch(2, 1);
 }

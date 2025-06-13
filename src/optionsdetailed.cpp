@@ -51,7 +51,7 @@ OptionsDetailed::OptionsDetailed(Config *_config, QWidget *parent)
     cFormat->addItems(config->pluginLoader()->formatList(
         PluginLoader::Encode,
         PluginLoader::CompressionType(PluginLoader::InferiorQuality | PluginLoader::Lossy | PluginLoader::Lossless | PluginLoader::Hybrid)));
-    connect(cFormat, SIGNAL(activated(const QString &)), this, SLOT(formatChanged(const QString &)));
+    connect(cFormat, &QComboBox::textActivated, this, &OptionsDetailed::formatChanged);
     //     connect( cFormat, SIGNAL(activated(const QString&)), this, SLOT(somethingChanged()) );
 
     topBox->addStretch();
@@ -61,14 +61,14 @@ OptionsDetailed::OptionsDetailed(Config *_config, QWidget *parent)
     cPlugin = new KComboBox(this);
     topBox->addWidget(cPlugin);
     cPlugin->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    connect(cPlugin, SIGNAL(activated(const QString &)), this, SLOT(encoderChanged(const QString &)));
-    connect(cPlugin, SIGNAL(activated(const QString &)), this, SLOT(somethingChanged()));
+    connect(cPlugin, &QComboBox::textActivated, this, &OptionsDetailed::encoderChanged);
+    connect(cPlugin, &QComboBox::activated, this, &OptionsDetailed::somethingChanged);
     pConfigurePlugin = new QPushButton(QIcon::fromTheme("configure"), "", this);
     pConfigurePlugin->setFixedSize(cPlugin->sizeHint().height(), cPlugin->sizeHint().height());
     pConfigurePlugin->setFlat(true);
     topBox->addWidget(pConfigurePlugin);
     topBox->setStretchFactor(pConfigurePlugin, 1);
-    connect(pConfigurePlugin, SIGNAL(clicked()), this, SLOT(configurePlugin()));
+    connect(pConfigurePlugin, &QAbstractButton::clicked, this, &OptionsDetailed::configurePlugin);
 
     // draw a horizontal line
     QFrame *lineFrame = new QFrame(this);
@@ -101,7 +101,7 @@ OptionsDetailed::OptionsDetailed(Config *_config, QWidget *parent)
             continue;
 
         wFilter.insert(widget, plugin);
-        connect(widget, SIGNAL(optionsChanged()), this, SLOT(somethingChanged()));
+        connect(widget, &FilterWidget::optionsChanged, this, &OptionsDetailed::somethingChanged);
         grid->addWidget(widget, gridRow++, 0);
         widget->show();
         filterCount++;
@@ -138,7 +138,7 @@ OptionsDetailed::OptionsDetailed(Config *_config, QWidget *parent)
     bottomBox->addWidget(pProfileSave);
     pProfileSave->setFixedWidth(pProfileSave->height());
     pProfileSave->setToolTip(i18n("Save current options as a profile"));
-    connect(pProfileSave, SIGNAL(clicked()), this, SLOT(saveCustomProfile()));
+    connect(pProfileSave, &QPushButton::clicked, this, &OptionsDetailed::saveCustomProfile);
     pProfileLoad = new QToolButton(this);
     bottomBox->addWidget(pProfileLoad);
     pProfileLoad->setIcon(QIcon::fromTheme("document-open"));
@@ -276,13 +276,13 @@ void OptionsDetailed::encoderChanged(const QString &encoder)
     }
     if (wPlugin) {
         grid->removeWidget(wPlugin);
-        disconnect(wPlugin, SIGNAL(optionsChanged()), 0, 0);
+        disconnect(wPlugin, &CodecWidget::optionsChanged, 0, 0);
         wPlugin = currentPlugin->deleteCodecWidget(wPlugin);
     }
     currentPlugin = plugin;
     wPlugin = plugin->newCodecWidget();
     if (wPlugin) {
-        connect(wPlugin, SIGNAL(optionsChanged()), this, SLOT(somethingChanged()));
+        connect(wPlugin, &CodecWidget::optionsChanged, this, &OptionsDetailed::somethingChanged);
         qobject_cast<CodecWidget *>(wPlugin)->setCurrentFormat(cFormat->currentText());
         if (plugin->lastConversionOptions()) {
             wPlugin->setCurrentConversionOptions(plugin->lastConversionOptions());

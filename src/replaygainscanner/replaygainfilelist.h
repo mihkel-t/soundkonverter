@@ -88,6 +88,9 @@ public slots:
     void addDir(const QUrl &directory, bool recursive, const QStringList &codecList);
     void updateItem(ReplayGainFileListItem *item, bool initialUpdate = false);
 
+    // connected to ReplayGainProcessor
+    void itemFinished(ReplayGainFileListItem *item, ReplayGainFileListItem::ReturnCode returnCode);
+
 private slots:
     void showContextMenu(const QPoint &point);
     //     void processAddSelectedItems();
@@ -95,9 +98,6 @@ private slots:
     //     void killSelectedItems();
     void moveSelectedItems();
     void removeSelectedItems();
-
-    // connected to ReplayGainProcessor
-    void itemFinished(ReplayGainFileListItem *item, ReplayGainFileListItem::ReturnCode returnCode);
 
 Q_SIGNALS:
     // connected to ProgressIndicator

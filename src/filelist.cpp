@@ -75,14 +75,14 @@ FileList::FileList(Logger *_logger, Config *_config, QWidget *parent)
     //     actionCollection = new KActionCollection( this );
 
     editAction = new QAction(QIcon::fromTheme("view-list-text"), i18n("Edit options..."), this);
-    connect(editAction, SIGNAL(triggered()), this, SLOT(showOptionsEditorDialog()));
+    connect(editAction, &QAction::triggered, this, &FileList::showOptionsEditorDialog);
     startAction = new QAction(QIcon::fromTheme("system-run"), i18n("Start conversion"), this);
-    connect(startAction, SIGNAL(triggered()), this, SLOT(convertSelectedItems()));
+    connect(startAction, &QAction::triggered, this, &FileList::convertSelectedItems);
     stopAction = new QAction(QIcon::fromTheme("process-stop"), i18n("Stop conversion"), this);
-    connect(stopAction, SIGNAL(triggered()), this, SLOT(killSelectedItems()));
+    connect(stopAction, &QAction::triggered, this, &FileList::killSelectedItems);
     removeAction = new QAction(QIcon::fromTheme("edit-delete"), i18n("Remove"), this);
     removeAction->setShortcut(QKeySequence::Delete);
-    connect(removeAction, SIGNAL(triggered()), this, SLOT(removeSelectedItems()));
+    connect(removeAction, &QAction::triggered, this, &FileList::removeSelectedItems);
     addAction(removeAction);
     //     QAction *removeActionGlobal = new QAction( QIcon::fromTheme("edit-delete"), i18n("Remove"), this );
     //     removeActionGlobal->setShortcut( QKeySequence::Delete );
@@ -93,9 +93,9 @@ FileList::FileList(Logger *_logger, Config *_config, QWidget *parent)
     contextMenu = new QMenu(this);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
+    connect(this, &QWidget::customContextMenuRequested, this, &FileList::showContextMenu);
 
-    connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(itemsSelected()));
+    connect(this, &QTreeWidget::itemSelectionChanged, this, &FileList::itemsSelected);
 }
 
 FileList::~FileList()
@@ -277,6 +277,11 @@ int FileList::listDir(const QString &directory, const QStringList &filter, bool 
     }
 
     return count;
+}
+
+void FileList::openFiles(const QList<QUrl> &files, ConversionOptions *conversionOptions)
+{
+    this->addFiles(files, conversionOptions, "", "", -1);
 }
 
 void FileList::addFiles(const QList<QUrl> &fileList,
@@ -476,7 +481,7 @@ void FileList::updateItem(FileListItem *item)
 
     removeItemWidget(item, Column_State);
     if (item->lInfo.data()) {
-        disconnect(item->lInfo.data(), SIGNAL(linkActivated(const QString &)), this, 0);
+        disconnect(item->lInfo.data(), &QLabel::linkActivated, this, 0);
         delete item->lInfo.data();
     }
 
@@ -533,7 +538,7 @@ void FileList::updateItem(FileListItem *item)
         }
         case FileListItem::CantWriteOutput: {
             item->lInfo = new QLabel("<a href=\"" + QString::number(item->logId) + "\">" + i18nc("Short conversion status", "Can't write output") + "</a>");
-            connect(item->lInfo.data(), SIGNAL(linkActivated(const QString &)), this, SLOT(showLogClicked(const QString &)));
+            connect(item->lInfo.data(), &QLabel::linkActivated, this, &FileList::showLogClicked);
             setItemWidget(item, Column_State, item->lInfo.data());
             const QString toolTip = i18n("The conversion has failed.\nSee the log for more information.");
             item->setToolTip(Column_State, toolTip);
@@ -548,7 +553,7 @@ void FileList::updateItem(FileListItem *item)
         }
         case FileListItem::Encrypted: {
             item->lInfo = new QLabel("<a href=\"" + QString::number(item->logId) + "\">" + i18nc("Short conversion status", "File is encrypted") + "</a>");
-            connect(item->lInfo.data(), SIGNAL(linkActivated(const QString &)), this, SLOT(showLogClicked(const QString &)));
+            connect(item->lInfo.data(), &QLabel::linkActivated, this, &FileList::showLogClicked);
             setItemWidget(item, Column_State, item->lInfo.data());
             const QString toolTip = i18n("The conversion has failed.\nSee the log for more information.");
             item->setToolTip(Column_State, toolTip);
@@ -559,7 +564,7 @@ void FileList::updateItem(FileListItem *item)
         }
         case FileListItem::Failed: {
             item->lInfo = new QLabel("<a href=\"" + QString::number(item->logId) + "\">" + i18nc("Short conversion status", "Failed") + "</a>");
-            connect(item->lInfo.data(), SIGNAL(linkActivated(const QString &)), this, SLOT(showLogClicked(const QString &)));
+            connect(item->lInfo.data(), &QLabel::linkActivated, this, &FileList::showLogClicked);
             setItemWidget(item, Column_State, item->lInfo.data());
             const QString toolTip = i18n("The conversion has failed.\nSee the log for more information.");
             item->setToolTip(Column_State, toolTip);
@@ -991,13 +996,13 @@ void FileList::showOptionsEditorDialog()
             // TODO error message
             return;
         }
-        connect(this, SIGNAL(editItems(QList<FileListItem *>)), optionsEditor, SLOT(itemsSelected(QList<FileListItem *>)));
-        connect(this, SIGNAL(setPreviousItemEnabled(bool)), optionsEditor, SLOT(setPreviousEnabled(bool)));
-        connect(this, SIGNAL(setNextItemEnabled(bool)), optionsEditor, SLOT(setNextEnabled(bool)));
-        connect(this, SIGNAL(itemRemoved(FileListItem *)), optionsEditor, SLOT(itemRemoved(FileListItem *)));
-        connect(optionsEditor, SIGNAL(user2Clicked()), this, SLOT(selectPreviousItem()));
-        connect(optionsEditor, SIGNAL(user1Clicked()), this, SLOT(selectNextItem()));
-        connect(optionsEditor, SIGNAL(updateFileListItems(QList<FileListItem *>)), this, SLOT(updateItems(QList<FileListItem *>)));
+        connect(this, &FileList::editItems, optionsEditor, &OptionsEditor::itemsSelected);
+        connect(this, &FileList::setPreviousItemEnabled, optionsEditor, &OptionsEditor::setPreviousEnabled);
+        connect(this, &FileList::setNextItemEnabled, optionsEditor, &OptionsEditor::setNextEnabled);
+        //connect(this, &FileList::itemRemoved, optionsEditor, &OptionsEditor::itemRemoved);
+        //connect(optionsEditor, &OptionsEditor::user2Clicked, this, &FileList::selectPreviousItem);
+        //connect(optionsEditor, &OptionsEditor::user1Clicked, this, &FileList::selectNextItem);
+        connect(optionsEditor, &OptionsEditor::updateFileListItems, this, &FileList::updateItems);
     }
     itemsSelected();
     optionsEditor->show();
@@ -1010,7 +1015,7 @@ void FileList::selectPreviousItem()
     if (!item)
         return;
 
-    disconnect(this, SIGNAL(itemSelectionChanged()), 0, 0); // avoid backfireing
+    disconnect(this, &FileList::itemSelectionChanged, 0, 0); // avoid backfireing
 
     for (int i = 0; i < selectedFiles.count(); i++) {
         selectedFiles.at(i)->setSelected(false);
@@ -1019,7 +1024,7 @@ void FileList::selectPreviousItem()
     item->setSelected(true);
     scrollToItem(item);
 
-    connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(itemsSelected()));
+    connect(this, &FileList::itemSelectionChanged, this, &FileList::itemsSelected);
 
     itemsSelected();
 }
@@ -1031,7 +1036,7 @@ void FileList::selectNextItem()
     if (!item)
         return;
 
-    disconnect(this, SIGNAL(itemSelectionChanged()), 0, 0); // avoid backfireing
+    disconnect(this, &FileList::itemSelectionChanged, 0, 0); // avoid backfireing
 
     for (int i = 0; i < selectedFiles.count(); i++) {
         selectedFiles.at(i)->setSelected(false);
@@ -1040,7 +1045,7 @@ void FileList::selectNextItem()
     item->setSelected(true);
     scrollToItem(item);
 
-    connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(itemsSelected()));
+    connect(this, &FileList::itemSelectionChanged, this, &FileList::itemsSelected);
 
     itemsSelected();
 }

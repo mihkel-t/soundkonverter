@@ -157,8 +157,8 @@ QList<ConversionPipeTrunk> soundkonverter_codec_ffmpeg::codecTable()
         if (ffmpegInfo.lastModified() > ffmpegLastModified || configVersion < version()) {
             infoProcess = new KProcess();
             infoProcess.data()->setOutputChannelMode(KProcess::MergedChannels);
-            connect(infoProcess.data(), SIGNAL(readyRead()), this, SLOT(infoProcessOutput()));
-            connect(infoProcess.data(), SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(infoProcessExit(int, QProcess::ExitStatus)));
+            connect(infoProcess.data(), &QProcess::readyRead, this, &soundkonverter_codec_ffmpeg::infoProcessOutput);
+            connect(infoProcess.data(), &QProcess::finished, this, &soundkonverter_codec_ffmpeg::infoProcessExit);
 
             QStringList command;
             command += binaries["ffmpeg"];
@@ -258,14 +258,12 @@ void soundkonverter_codec_ffmpeg::showConfigDialog(ActionType action, const QStr
     if (!configDialog.data()) {
         configDialog = new QDialog(parent);
         configDialog.data()->setWindowTitle(i18n("Configure %1", *global_plugin_name));
-        // configDialog.data()->setButtons(QDialog::Ok | QDialog::Cancel | QDialog::Default);
 
         QHBoxLayout *configDialogBox = new QHBoxLayout(configDialog.data());
         configDialogExperimantalCodecsEnabledCheckBox = new QCheckBox(i18n("Enable experimental codecs"), configDialog.data());
         configDialogBox->addWidget(configDialogExperimantalCodecsEnabledCheckBox);
 
-        connect(configDialog.data(), SIGNAL(okClicked()), this, SLOT(configDialogSave()));
-        connect(configDialog.data(), SIGNAL(defaultClicked()), this, SLOT(configDialogDefault()));
+        connect(configDialog.data(), &QDialog::finished, this, &soundkonverter_codec_ffmpeg::configDialogSave);
     }
     configDialogExperimantalCodecsEnabledCheckBox->setChecked(experimentalCodecsEnabled);
     configDialog.data()->show();
@@ -287,13 +285,6 @@ void soundkonverter_codec_ffmpeg::configDialogSave()
             KMessageBox::information(configDialog.data(), i18n("Please restart soundKonverter in order to activate the changes."));
         }
         configDialog.data()->deleteLater();
-    }
-}
-
-void soundkonverter_codec_ffmpeg::configDialogDefault()
-{
-    if (configDialog.data()) {
-        configDialogExperimantalCodecsEnabledCheckBox->setChecked(false);
     }
 }
 
@@ -362,8 +353,8 @@ int soundkonverter_codec_ffmpeg::convert(const QUrl &inputFile,
     newItem->id = lastId++;
     newItem->process = new KProcess(newItem);
     newItem->process->setOutputChannelMode(KProcess::MergedChannels);
-    connect(newItem->process, SIGNAL(readyRead()), this, SLOT(processOutput()));
-    connect(newItem->process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processExit(int, QProcess::ExitStatus)));
+    connect(newItem->process, &QProcess::readyRead, this, &soundkonverter_codec_ffmpeg::processOutput);
+    connect(newItem->process, &QProcess::finished, this, &soundkonverter_codec_ffmpeg::processExit);
 
     if (tags)
         newItem->data.length = tags->length;

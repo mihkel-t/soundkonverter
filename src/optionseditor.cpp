@@ -45,8 +45,8 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     prevButton->setAutoRepeat(true);
     addActionButton(prevButton);
 
-    connect(this, SIGNAL(applyClicked()), this, SLOT(applyChanges()));
-    connect(this, SIGNAL(okClicked()), this, SLOT(applyChanges()));
+    //connect(this, SIGNAL(applyClicked()), this, SLOT(applyChanges()));
+    //connect(this, SIGNAL(okClicked()), this, SLOT(applyChanges()));
 
     QWidget *conversionOptionsWidget = new QWidget(this);
     KPageWidgetItem *conversionOptionsPage = addPage(conversionOptionsWidget, i18n("Conversion"));
@@ -67,7 +67,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pEditOptions->setFixedWidth(pEditOptions->sizeHint().width());
     conversionOptionsGridLayout->addWidget(pEditOptions, 3, 0, Qt::AlignHCenter);
     pEditOptions->hide();
-    connect(pEditOptions, SIGNAL(clicked()), this, SLOT(editOptionsClicked()));
+    connect(pEditOptions, &QPushButton::clicked, this, &OptionsEditor::editOptionsClicked);
 
     QWidget *tagsWidget = new QWidget(this);
     KPageWidgetItem *tagsPage = addPage(tagsWidget, i18n("Tags"));
@@ -101,7 +101,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pTitleEdit->setToolTip(i18n("Edit"));
     pTitleEdit->hide();
     titleBox->addWidget(pTitleEdit);
-    connect(pTitleEdit, SIGNAL(clicked()), this, SLOT(editTitleClicked()));
+    connect(pTitleEdit, &QPushButton::clicked, this, &OptionsEditor::editTitleClicked);
     lTrackLabel = new QLabel(i18n("Track No.:"), tagsWidget);
     titleBox->addWidget(lTrackLabel);
     iTrack = new QSpinBox(tagsWidget);
@@ -114,7 +114,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pTrackEdit->setToolTip(i18n("Edit"));
     pTrackEdit->hide();
     titleBox->addWidget(pTrackEdit);
-    connect(pTrackEdit, SIGNAL(clicked()), this, SLOT(editTrackClicked()));
+    connect(pTrackEdit, &QPushButton::clicked, this, &OptionsEditor::editTrackClicked);
     lTrackTotalLabel = new QLabel(i18nc("Track/Disc No. x of y", "of"), tagsWidget);
     titleBox->addWidget(lTrackTotalLabel);
     iTrackTotal = new QSpinBox(tagsWidget);
@@ -127,7 +127,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pTrackTotalEdit->setToolTip(i18n("Edit"));
     pTrackTotalEdit->hide();
     titleBox->addWidget(pTrackTotalEdit);
-    connect(pTrackTotalEdit, SIGNAL(clicked()), this, SLOT(editTrackTotalClicked()));
+    connect(pTrackTotalEdit, &QPushButton::clicked, this, &OptionsEditor::editTrackTotalClicked);
 
     // add a horizontal box layout for the artist and the composer
     QHBoxLayout *artistBox = new QHBoxLayout();
@@ -143,7 +143,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pArtistEdit->setToolTip(i18n("Edit"));
     pArtistEdit->hide();
     artistBox->addWidget(pArtistEdit);
-    connect(pArtistEdit, SIGNAL(clicked()), this, SLOT(editArtistClicked()));
+    connect(pArtistEdit, &QPushButton::clicked, this, &OptionsEditor::editArtistClicked);
     lComposerLabel = new QLabel(i18n("Composer:"), tagsWidget);
     artistBox->addWidget(lComposerLabel);
     lComposer = new KLineEdit(tagsWidget);
@@ -154,7 +154,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pComposerEdit->setToolTip(i18n("Edit"));
     pComposerEdit->hide();
     artistBox->addWidget(pComposerEdit);
-    connect(pComposerEdit, SIGNAL(clicked()), this, SLOT(editComposerClicked()));
+    connect(pComposerEdit, &QPushButton::clicked, this, &OptionsEditor::editComposerClicked);
 
     // add a horizontal box layout for the album
     QHBoxLayout *albumArtistBox = new QHBoxLayout();
@@ -170,7 +170,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pAlbumArtistEdit->setToolTip(i18n("Edit"));
     pAlbumArtistEdit->hide();
     albumArtistBox->addWidget(pAlbumArtistEdit);
-    connect(pAlbumArtistEdit, SIGNAL(clicked()), this, SLOT(editAlbumArtistClicked()));
+    connect(pAlbumArtistEdit, &QPushButton::clicked, this, &OptionsEditor::editAlbumArtistClicked);
 
     // add a horizontal box layout for the album
     QHBoxLayout *albumBox = new QHBoxLayout();
@@ -186,7 +186,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pAlbumEdit->setToolTip(i18n("Edit"));
     pAlbumEdit->hide();
     albumBox->addWidget(pAlbumEdit);
-    connect(pAlbumEdit, SIGNAL(clicked()), this, SLOT(editAlbumClicked()));
+    connect(pAlbumEdit, &QPushButton::clicked, this, &OptionsEditor::editAlbumClicked);
 
     // add a horizontal box layout for the disc number, year and genre
     QHBoxLayout *albumdataBox = new QHBoxLayout();
@@ -204,7 +204,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pDiscEdit->setToolTip(i18n("Edit"));
     pDiscEdit->hide();
     albumdataBox->addWidget(pDiscEdit);
-    connect(pDiscEdit, SIGNAL(clicked()), this, SLOT(editDiscClicked()));
+    connect(pDiscEdit, &QPushButton::clicked, this, &OptionsEditor::editDiscClicked);
     lDiscTotalLabel = new QLabel(i18nc("Track/Disc No. x of y", "of"), tagsWidget);
     albumdataBox->addWidget(lDiscTotalLabel);
     iDiscTotal = new QSpinBox(tagsWidget);
@@ -217,7 +217,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pDiscTotalEdit->setToolTip(i18n("Edit"));
     pDiscTotalEdit->hide();
     albumdataBox->addWidget(pDiscTotalEdit);
-    connect(pDiscTotalEdit, SIGNAL(clicked()), this, SLOT(editDiscTotalClicked()));
+    connect(pDiscTotalEdit, &QPushButton::clicked, this, &OptionsEditor::editDiscTotalClicked);
     albumdataBox->addStretch();
     lYearLabel = new QLabel(i18n("Year:"), tagsWidget);
     albumdataBox->addWidget(lYearLabel);
@@ -231,7 +231,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pYearEdit->setToolTip(i18n("Edit"));
     pYearEdit->hide();
     albumdataBox->addWidget(pYearEdit);
-    connect(pYearEdit, SIGNAL(clicked()), this, SLOT(editYearClicked()));
+    connect(pYearEdit, &QPushButton::clicked, this, &OptionsEditor::editYearClicked);
     albumdataBox->addStretch();
     lGenreLabel = new QLabel(i18n("Genre:"), tagsWidget);
     albumdataBox->addWidget(lGenreLabel);
@@ -248,7 +248,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pGenreEdit->setToolTip(i18n("Edit"));
     pGenreEdit->hide();
     albumdataBox->addWidget(pGenreEdit);
-    connect(pGenreEdit, SIGNAL(clicked()), this, SLOT(editGenreClicked()));
+    connect(pGenreEdit, &QPushButton::clicked, this, &OptionsEditor::editGenreClicked);
 
     // add a horizontal box layout for the comment
     QHBoxLayout *commentBox = new QHBoxLayout();
@@ -264,7 +264,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pCommentEdit->setToolTip(i18n("Edit"));
     pCommentEdit->hide();
     commentBox->addWidget(pCommentEdit);
-    connect(pCommentEdit, SIGNAL(clicked()), this, SLOT(editCommentClicked()));
+    connect(pCommentEdit, &QPushButton::clicked, this, &OptionsEditor::editCommentClicked);
     tagsGridLayout->setRowStretch(6, 1);
 
     lEditTags = new QLabel("", tagsWidget);
@@ -275,7 +275,7 @@ OptionsEditor::OptionsEditor(Config *_config, QWidget *parent)
     pEditTags->setFixedWidth(pEditTags->sizeHint().width());
     tagsGridLayout->addWidget(pEditTags, 8, 1, Qt::AlignHCenter);
     pEditTags->hide();
-    connect(pEditTags, SIGNAL(clicked()), this, SLOT(editTagsClicked()));
+    connect(pEditTags, &QPushButton::clicked, this, &OptionsEditor::editTagsClicked);
 }
 
 OptionsEditor::~OptionsEditor()

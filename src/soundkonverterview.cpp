@@ -9,7 +9,6 @@
 #include "config.h"
 #include "convert.h"
 #include "filelist.h"
-#include "filelistitem.h"
 #include "logger.h"
 #include "opener/cdopener.h"
 #include "opener/diropener.h"
@@ -52,21 +51,18 @@ soundKonverterView::soundKonverterView(Logger *_logger, Config *_config, CDManag
     fileList = new FileList(logger, config, this);
     gridLayout->addWidget(fileList, 1, 0);
     gridLayout->setRowStretch(1, 1);
-    connect(fileList, SIGNAL(fileCountChanged(int)), this, SLOT(fileCountChanged(int)));
-    connect(fileList, SIGNAL(conversionStarted()), this, SLOT(conversionStarted()));
-    connect(fileList, SIGNAL(conversionStopped(bool)), this, SLOT(conversionStopped(bool)));
-    connect(fileList, SIGNAL(queueModeChanged(bool)), this, SLOT(queueModeChanged(bool)));
-    connect(fileList, SIGNAL(showLog(int)), this, SIGNAL(showLog(int)));
+    connect(fileList, &FileList::fileCountChanged, this, &soundKonverterView::fileCountChanged);
+    connect(fileList, &FileList::conversionStarted, this, &soundKonverterView::conversionStarted);
+    connect(fileList, &FileList::conversionStopped, this, &soundKonverterView::conversionStopped);
+    connect(fileList, &FileList::queueModeChanged, this, &soundKonverterView::queueModeChanged);
+    connect(fileList, &FileList::showLog, this, &soundKonverterView::showLog);
 
     optionsLayer = new OptionsLayer(config, this);
     fileList->setOptionsLayer(optionsLayer);
     optionsLayer->hide();
     gridLayout->addWidget(optionsLayer, 1, 0);
-    connect(optionsLayer,
-            SIGNAL(done(const QList<QUrl> &, ConversionOptions *, const QString &)),
-            fileList,
-            SLOT(addFiles(const QList<QUrl> &, ConversionOptions *, const QString &)));
-    connect(optionsLayer, SIGNAL(saveFileList()), fileList, SLOT(save()));
+    connect(optionsLayer, &OptionsLayer::done, fileList, &FileList::openFiles);
+    connect(optionsLayer, &OptionsLayer::saveFileList, fileList, [=]() { fileList->save(); });
 
     // add a horizontal box layout for the add combobutton to the grid
     QHBoxLayout *addBox = new QHBoxLayout();
@@ -86,31 +82,31 @@ soundKonverterView::soundKonverterView(Logger *_logger, Config *_config, CDManag
     cAdd->insertItem(QIcon::fromTheme("view-media-playlist"), i18n("Add playlist..."));
     cAdd->increaseHeight(0.3 * fontHeight);
     addBox->addWidget(cAdd, 0, Qt::AlignVCenter);
-    connect(cAdd, SIGNAL(clicked(int)), this, SLOT(addClicked(int)));
+    connect(cAdd, &ComboButton::clicked, this, &soundKonverterView::addClicked);
     cAdd->setFocus();
 
     addBox->addSpacing(fontHeight);
 
     startAction = new QAction(QIcon::fromTheme("system-run"), i18n("Start"), this);
-    connect(startAction, SIGNAL(triggered()), fileList, SLOT(startConversion()));
+    connect(startAction, &QAction::triggered, fileList, &FileList::startConversion);
 
     pStart = new QPushButton(QIcon::fromTheme("system-run"), i18n("Start"), this);
     pStart->setFixedHeight(pStart->size().height());
     pStart->setEnabled(false);
     startAction->setEnabled(false);
     addBox->addWidget(pStart, 0, Qt::AlignVCenter);
-    connect(pStart, SIGNAL(clicked()), fileList, SLOT(startConversion()));
+    connect(pStart, &QAbstractButton::clicked, fileList, &FileList::startConversion);
 
     stopActionMenu = new QMenu(i18n("Stop"), this);
     killAction = new QAction(QIcon::fromTheme("flag-red"), i18n("Stop immediatelly"), this);
     stopActionMenu->addAction(killAction);
-    connect(killAction, SIGNAL(triggered()), fileList, SLOT(killConversion()));
+    connect(killAction, &QAction::triggered, fileList, &FileList::killConversion);
     stopAction = new QAction(QIcon::fromTheme("flag-yellow"), i18n("Stop after current conversions are completed"), this);
     stopActionMenu->addAction(stopAction);
-    connect(stopAction, SIGNAL(triggered()), fileList, SLOT(stopConversion()));
+    connect(stopAction, &QAction::triggered, fileList, &FileList::stopConversion);
     continueAction = new QAction(QIcon::fromTheme("flag-green"), i18n("Continue after current conversions are completed"), this);
     stopActionMenu->addAction(continueAction);
-    connect(continueAction, SIGNAL(triggered()), fileList, SLOT(continueConversion()));
+    connect(continueAction, &QAction::triggered, fileList, &FileList::continueConversion);
     queueModeChanged(true);
 
     pStop = new QPushButton(QIcon::fromTheme("process-stop"), i18n("Stop"), this);
@@ -124,24 +120,21 @@ soundKonverterView::soundKonverterView(Logger *_logger, Config *_config, CDManag
 
     progressIndicator = new ProgressIndicator(this, ProgressIndicator::Feature(ProgressIndicator::FeatureSpeed | ProgressIndicator::FeatureTime));
     addBox->addWidget(progressIndicator, 0, Qt::AlignVCenter);
-    connect(progressIndicator, SIGNAL(progressChanged(const QString &)), this, SIGNAL(progressChanged(const QString &)));
-    connect(fileList, SIGNAL(timeChanged(float)), progressIndicator, SLOT(timeChanged(float)));
-    connect(fileList, SIGNAL(finished(bool)), progressIndicator, SLOT(finished(bool)));
+    connect(progressIndicator, &ProgressIndicator::progressChanged, this, &soundKonverterView::progressChanged);
+    connect(fileList, &FileList::timeChanged, progressIndicator, &ProgressIndicator::timeChanged);
+    connect(fileList, &FileList::finished, progressIndicator, &ProgressIndicator::finished);
 
     Convert *convert = new Convert(config, fileList, logger, this);
-    connect(fileList, SIGNAL(convertItem(FileListItem *)), convert, SLOT(add(FileListItem *)));
-    connect(fileList, SIGNAL(killItem(FileListItem *)), convert, SLOT(kill(FileListItem *)));
-    connect(fileList, SIGNAL(itemRemoved(FileListItem *)), convert, SLOT(itemRemoved(FileListItem *)));
-    connect(convert,
-            SIGNAL(finished(FileListItem *, FileListItem::ReturnCode, bool)),
-            fileList,
-            SLOT(itemFinished(FileListItem *, FileListItem::ReturnCode, bool)));
-    connect(convert, SIGNAL(rippingFinished(const QString &)), fileList, SLOT(rippingFinished(const QString &)));
+    connect(fileList, &FileList::convertItem, convert, &Convert::add);
+    connect(fileList, &FileList::killItem, convert, &Convert::kill);
+    connect(fileList, &FileList::itemRemoved, convert, &Convert::itemRemoved);
+    connect(convert, &Convert::finished, fileList, &FileList::itemFinished);
+    connect(convert, &Convert::rippingFinished, fileList, &FileList::rippingFinished);
 
-    connect(convert, SIGNAL(finishedProcess(int, bool, bool)), logger, SLOT(processCompleted(int, bool, bool)));
+    connect(convert, &Convert::finishedProcess, logger, &Logger::processCompleted);
 
-    connect(convert, SIGNAL(updateTime(float)), progressIndicator, SLOT(update(float)));
-    connect(convert, SIGNAL(timeFinished(float)), progressIndicator, SLOT(timeFinished(float)));
+    connect(convert, &Convert::updateTime, progressIndicator, &ProgressIndicator::update);
+    connect(convert, &Convert::timeFinished, progressIndicator, &ProgressIndicator::timeFinished);
 }
 
 soundKonverterView::~soundKonverterView()
@@ -169,11 +162,11 @@ void soundKonverterView::showFileDialog()
     //     dialog->resize( size().width() - 10, size().height() );
 
     if (!dialog->dialogAborted) {
-        connect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), fileList, SLOT(addFiles(const QList<QUrl> &, ConversionOptions *)));
+        connect(dialog, &FileOpener::openFiles, fileList, &FileList::openFiles);
 
         dialog->exec();
 
-        disconnect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), 0, 0);
+        disconnect(dialog, &FileOpener::openFiles, 0, 0);
 
         fileList->save(false);
     }
@@ -186,14 +179,11 @@ void soundKonverterView::showDirDialog()
     DirOpener *dialog = new DirOpener(config, DirOpener::Convert, this);
 
     if (!dialog->dialogAborted) {
-        connect(dialog,
-                SIGNAL(openFiles(const QUrl &, bool, const QStringList &, ConversionOptions *)),
-                fileList,
-                SLOT(addDir(const QUrl &, bool, const QStringList &, ConversionOptions *)));
+        connect(dialog, &DirOpener::openFiles, fileList, &FileList::addDir);
 
         dialog->exec();
 
-        disconnect(dialog, SIGNAL(openFiles(const QUrl &, bool, const QStringList &, ConversionOptions *)), 0, 0);
+        disconnect(dialog, &DirOpener::openFiles, 0, 0);
 
         fileList->save(false);
     }
@@ -239,14 +229,11 @@ bool soundKonverterView::showCdDialog(const QString &device, QString _profile, Q
         if (!notifyCommand.isEmpty())
             dialog->setCommand(notifyCommand);
 
-        connect(dialog,
-                SIGNAL(addTracks(const QString &, QList<int>, int, QList<TagData *>, ConversionOptions *, const QString &)),
-                fileList,
-                SLOT(addTracks(const QString &, QList<int>, int, QList<TagData *>, ConversionOptions *, const QString &)));
+        connect(dialog, &CDOpener::addTracks, fileList, &FileList::addTracks);
 
         dialog->exec();
 
-        disconnect(dialog, SIGNAL(addTracks(const QString &, QList<int>, int, QList<TagData *>, ConversionOptions *, const QString &)), 0, 0);
+        disconnect(dialog, &CDOpener::addTracks, 0, 0);
 
         if (dialog->result() == QDialog::Accepted) {
             success = true;
@@ -265,11 +252,11 @@ void soundKonverterView::showUrlDialog()
 {
     UrlOpener *dialog = new UrlOpener(config, this);
 
-    connect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), fileList, SLOT(addFiles(const QList<QUrl> &, ConversionOptions *)));
+    connect(dialog, &UrlOpener::openFiles, fileList, &FileList::openFiles);
 
     dialog->exec();
 
-    disconnect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), 0, 0);
+    disconnect(dialog, &UrlOpener::openFiles, 0, 0);
 
     delete dialog;
 
@@ -282,11 +269,11 @@ void soundKonverterView::showPlaylistDialog()
     //     dialog->resize( size().width() - 10, size().height() );
 
     if (!dialog->dialogAborted) {
-        connect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), fileList, SLOT(addFiles(const QList<QUrl> &, ConversionOptions *)));
+        connect(dialog, &PlaylistOpener::openFiles, fileList, &FileList::openFiles);
 
         dialog->exec();
 
-        disconnect(dialog, SIGNAL(openFiles(const QList<QUrl> &, ConversionOptions *)), 0, 0);
+        disconnect(dialog, &PlaylistOpener::openFiles, 0, 0);
 
         fileList->save(false);
     }

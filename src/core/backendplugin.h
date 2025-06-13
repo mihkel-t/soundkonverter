@@ -114,7 +114,7 @@ Q_SIGNALS:
     void log(int id, const QString &message);
     void jobFinished(int id, int exitCode);
 
-private Q_SLOTS:
+protected Q_SLOTS:
     /** Get the process' output */
     virtual void processOutput();
 

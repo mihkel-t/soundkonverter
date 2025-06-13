@@ -34,8 +34,8 @@ FlakeCodecWidget::FlakeCodecWidget()
     sCompressionLevel->setPageStep(1);
     //     sQuality->setTickPosition( QSlider::TicksBelow );
     //     sQuality->setFixedWidth( sQuality->sizeHint().width() );
-    connect(sCompressionLevel, SIGNAL(valueChanged(int)), this, SLOT(compressionLevelSliderChanged(int)));
-    connect(sCompressionLevel, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(sCompressionLevel, &QAbstractSlider::valueChanged, this, &FlakeCodecWidget::compressionLevelSliderChanged);
+    connect(sCompressionLevel, &QAbstractSlider::valueChanged, this, &CodecWidget::optionsChanged);
     topBox->addWidget(sCompressionLevel);
 
     iCompressionLevel = new QSpinBox(this);
@@ -43,8 +43,8 @@ FlakeCodecWidget::FlakeCodecWidget()
     iCompressionLevel->setSingleStep(1);
     iCompressionLevel->setFixedWidth(iCompressionLevel->sizeHint().width());
     //     dQuality->setFixedHeight( cMode->minimumSizeHint().height() );
-    connect(iCompressionLevel, SIGNAL(valueChanged(int)), this, SLOT(compressionLevelSpinBoxChanged(int)));
-    connect(iCompressionLevel, SIGNAL(valueChanged(int)), SIGNAL(optionsChanged()));
+    connect(iCompressionLevel, &QSpinBox::valueChanged, this, &FlakeCodecWidget::compressionLevelSpinBoxChanged);
+    connect(iCompressionLevel, &QSpinBox::valueChanged, this, &FlakeCodecWidget::optionsChanged);
     topBox->addWidget(iCompressionLevel);
 
     topBox->addStretch();
@@ -98,7 +98,7 @@ FlakeCodecWidget::FlakeCodecWidget()
         "\t\t2 = variable, method 2";
     lCmdArguments->setToolTip(toolTip);
     cmdArgumentsBox->addWidget(lCmdArguments);
-    connect(cCmdArguments, SIGNAL(toggled(bool)), lCmdArguments, SLOT(setEnabled(bool)));
+    connect(cCmdArguments, &QCheckBox::toggled, lCmdArguments, &QWidget::setEnabled);
 
     grid->setRowStretch(2, 1);
 
